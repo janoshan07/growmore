@@ -2,10 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import {
-  FiBarChart2, FiPieChart, FiTrendingUp, FiLogOut,
-  FiMenu, FiX, FiShield, FiUser, FiHome, FiChevronDown
-} from 'react-icons/fi';
+import { FiMenu, FiX, FiChevronDown } from 'react-icons/fi';
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -20,91 +17,76 @@ export default function Header() {
     setProfileDropdownOpen(false);
   };
 
-  // Define navigation links based on auth state
-  const navLinks = user
-    ? [
-        { to: '/dashboard', label: 'Dashboard', icon: FiBarChart2 },
-        { to: '/market', label: 'Market', icon: FiTrendingUp },
-        { to: '/portfolio', label: 'Portfolio', icon: FiPieChart },
-      ]
-    : [
-        { to: '/', label: 'Home', icon: FiHome },
-      ];
+  // Public links replicating the Citadel style exactly
+  const publicLinks = [
+    { to: '/who-we-are', label: 'Who We Are' },
+    { to: '/what-we-do', label: 'What We Do' },
+    { to: '/news', label: 'News' },
+    { to: '/careers', label: 'Careers' },
+  ];
+
+  // Private links for the trading app
+  const privateLinks = [
+    { to: '/dashboard', label: 'Dashboard' },
+    { to: '/market', label: 'Market' },
+    { to: '/portfolio', label: 'Portfolio' },
+  ];
+
+  const navLinks = user ? privateLinks : publicLinks;
 
   return (
-    <header className="sticky top-0 z-50 bg-dark-100/80 backdrop-blur-md border-b border-gray-700/50 transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 transition-all duration-300">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center h-20">
           
-          {/* Logo */}
-          <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
-              <FiTrendingUp className="text-white w-5 h-5" />
+          {/* Logo (Citadel Style) */}
+          <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-4 group mr-auto">
+            <div className="flex flex-col items-center justify-center gap-0.5 w-10">
+              {/* Geometric blocks imitating Citadel logo */}
+              <div className="flex gap-1">
+                <div className="w-2.5 h-2.5 bg-primary-900"></div>
+                <div className="w-2.5 h-2.5 bg-primary-900"></div>
+                <div className="w-2.5 h-2.5 bg-primary-900"></div>
+              </div>
+              <div className="w-full h-1.5 bg-primary-900 mt-0.5"></div>
+              <div className="w-full h-1.5 bg-primary-900 mt-0.5"></div>
             </div>
-            <span className="font-bold text-xl text-white tracking-tight">
-              Grow<span className="text-primary-400">More</span>
+            <span className="text-[26px] tracking-wide text-primary-900" style={{ fontFamily: 'Times New Roman, serif' }}>
+              GROW MORE
             </span>
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-2">
-            {navLinks.map(({ to, label, icon: Icon }) => (
+          {/* Center Navigation Links */}
+          <nav className="hidden md:flex items-center gap-8 mx-auto absolute left-1/2 -translate-x-1/2">
+            {navLinks.map(({ to, label }) => (
               <Link
                 key={to}
                 to={to}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                className={`text-sm font-medium transition-colors duration-200
                   ${location.pathname === to
-                    ? 'bg-primary-500/10 text-primary-400'
-                    : 'text-gray-400 hover:text-gray-100 hover:bg-white/5'
+                    ? 'text-primary-900 font-bold'
+                    : 'text-primary-900 hover:text-primary-600'
                   }`}
               >
-                <Icon className="w-4 h-4" />
                 {label}
               </Link>
             ))}
-            
-            {user?.role === 'admin' && (
-              <Link
-                to="/admin"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                  ${location.pathname === '/admin'
-                    ? 'bg-purple-500/10 text-purple-400'
-                    : 'text-gray-400 hover:text-gray-100 hover:bg-white/5'
-                  }`}
-              >
-                <FiShield className="w-4 h-4" />
-                Admin
-              </Link>
-            )}
           </nav>
 
-          {/* Right Section: Auth Buttons or User Profile */}
-          <div className="hidden md:flex items-center gap-4">
+          {/* Right Section: Client Login or Profile */}
+          <div className="hidden md:flex items-center ml-auto">
             {!user ? (
-              <div className="flex items-center gap-3">
-                <Link to="/login" className="text-sm font-medium text-gray-300 hover:text-white transition-colors px-3 py-2">
-                  Login
-                </Link>
-                <Link to="/register" className="btn-primary py-2 px-4 text-sm shadow-lg shadow-primary-500/20">
-                  Get Started
-                </Link>
-              </div>
+              <Link to="/login" className="text-sm font-medium text-primary-900 hover:text-primary-600 transition-colors">
+                Client Login
+              </Link>
             ) : (
               <div className="relative">
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-3 p-1.5 pr-3 rounded-xl border border-gray-700/50 hover:bg-white/5 transition-colors focus:outline-none"
+                  className="flex items-center gap-2 text-sm font-medium text-primary-900 hover:text-primary-600 transition-colors focus:outline-none"
                 >
-                  <div className="w-8 h-8 bg-primary-500/20 rounded-lg flex items-center justify-center">
-                    <FiUser className="text-primary-400 w-4 h-4" />
-                  </div>
-                  <div className="text-left hidden lg:block">
-                    <p className="text-sm font-semibold text-white leading-tight">{user.name}</p>
-                    <p className="text-xs text-primary-400 font-mono">
-                      ${user.balance?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                    </p>
-                  </div>
-                  <FiChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                  {user.name}
+                  <FiChevronDown className={`w-4 h-4 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Profile Dropdown */}
@@ -117,25 +99,20 @@ export default function Header() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-48 bg-dark-100 border border-gray-700/50 rounded-xl shadow-xl z-50 overflow-hidden"
+                        className="absolute right-0 mt-4 w-48 bg-white border border-gray-200 shadow-lg z-50 py-2"
                       >
-                        <div className="px-4 py-3 border-b border-gray-700/50 lg:hidden">
-                          <p className="text-sm font-medium text-white">{user.name}</p>
-                          <p className="text-xs text-primary-400 font-mono mt-0.5">
+                        <div className="px-4 py-2 border-b border-gray-100 mb-1">
+                          <p className="text-xs text-gray-500 uppercase tracking-wider">Balance</p>
+                          <p className="text-sm font-semibold text-primary-900">
                             ${user.balance?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                           </p>
                         </div>
-                        <div className="py-1">
-                          <Link to="/dashboard" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
-                            <FiBarChart2 className="w-4 h-4" /> Dashboard
-                          </Link>
-                          <button
-                            onClick={handleLogout}
-                            className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
-                          >
-                            <FiLogOut className="w-4 h-4" /> Logout
-                          </button>
-                        </div>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors"
+                        >
+                          Logout
+                        </button>
                       </motion.div>
                     </>
                   )}
@@ -146,7 +123,7 @@ export default function Header() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors"
+            className="md:hidden ml-auto text-primary-900 hover:text-primary-600 p-2"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
@@ -162,42 +139,38 @@ export default function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-dark-200 border-t border-gray-700/50 overflow-hidden"
+            className="md:hidden bg-white border-t border-gray-200 overflow-hidden"
           >
-            <div className="px-4 py-4 space-y-2">
-              {navLinks.map(({ to, label, icon: Icon }) => (
+            <div className="px-6 py-4 flex flex-col gap-4">
+              {navLinks.map(({ to, label }) => (
                 <Link
                   key={to}
                   to={to}
                   onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
-                    ${location.pathname === to 
-                      ? 'bg-primary-500/10 text-primary-400' 
-                      : 'text-gray-300 hover:bg-white/5 hover:text-white'}`}
+                  className="text-base font-medium text-primary-900"
                 >
-                  <Icon className="w-5 h-5" /> {label}
+                  {label}
                 </Link>
               ))}
               
-              {!user ? (
-                <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-700/50">
-                  <Link to="/login" onClick={() => setMobileOpen(false)} className="btn-secondary text-center py-2.5">
-                    Login
+              <div className="pt-4 border-t border-gray-100 mt-2">
+                {!user ? (
+                  <Link 
+                    to="/login" 
+                    onClick={() => setMobileOpen(false)} 
+                    className="text-base font-medium text-primary-900"
+                  >
+                    Client Login
                   </Link>
-                  <Link to="/register" onClick={() => setMobileOpen(false)} className="btn-primary text-center py-2.5">
-                    Get Started
-                  </Link>
-                </div>
-              ) : (
-                <div className="pt-4 mt-2 border-t border-gray-700/50">
+                ) : (
                   <button
                     onClick={() => { handleLogout(); setMobileOpen(false); }}
-                    className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors"
+                    className="text-base font-medium text-red-600 text-left w-full"
                   >
-                    <FiLogOut className="w-5 h-5" /> Logout
+                    Logout
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </motion.div>
         )}

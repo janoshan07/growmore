@@ -39,7 +39,8 @@ const PublicRoute = ({ children }) => {
 const AppRoutes = () => {
   const { user } = useAuth();
   return (
-    <div className="min-h-screen flex flex-col bg-dark-300">
+    <div className="min-h-screen flex flex-col bg-gray-50 relative">
+      <div className="animated-edge-overlay"></div>
       <Header />
       <main className="flex-grow flex flex-col relative">
         <Routes>
@@ -67,9 +68,9 @@ export default function App() {
           <Toaster
             position="top-right"
             toastOptions={{
-              style: { background: '#1e2130', color: '#f3f4f6', border: '1px solid #374151' },
-              success: { iconTheme: { primary: '#22c55e', secondary: '#fff' } },
-              error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+              style: { background: '#ffffff', color: '#111827', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' },
+              success: { iconTheme: { primary: '#16a34a', secondary: '#fff' } },
+              error: { iconTheme: { primary: '#dc2626', secondary: '#fff' } },
             }}
           />
         </Router>

@@ -51,19 +51,19 @@ export default function Portfolio() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-dark-300 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-gray-500">Loading portfolio...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-dark-300">
+    <div className="min-h-screen bg-gray-50">
       <MarketTicker />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-white">Portfolio</h1>
-          <p className="text-gray-500 text-sm mt-1">Your holdings and trade history</p>
+          <h1 className="text-2xl font-bold text-gray-900">Portfolio</h1>
+          <p className="text-gray-600 text-sm mt-1">Your holdings and trade history</p>
         </div>
 
         {/* Summary Cards */}
@@ -74,12 +74,12 @@ export default function Portfolio() {
             { label: 'Total P&L', value: summary.totalProfitLoss, prefix: '$', colored: true },
             { label: 'Net Worth', value: summary.netWorth, prefix: '$' },
           ].map((item) => (
-            <div key={item.label} className="card">
+            <div key={item.label} className="card bg-white shadow-sm border-gray-200">
               <p className="text-xs text-gray-500 uppercase tracking-wider">{item.label}</p>
               <p className={`text-xl font-bold font-mono mt-1 ${
                 item.colored
-                  ? item.value >= 0 ? 'text-green-400' : 'text-red-400'
-                  : 'text-white'
+                  ? item.value >= 0 ? 'text-green-600' : 'text-red-600'
+                  : 'text-gray-900'
               }`}>
                 {item.value >= 0 || !item.colored ? '' : '-'}
                 {item.prefix}{Math.abs(item.value || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
@@ -90,13 +90,13 @@ export default function Portfolio() {
 
         <div className="grid lg:grid-cols-3 gap-6 mb-6">
           {/* Holdings Table */}
-          <div className="lg:col-span-2 card">
-            <h2 className="font-bold text-white mb-4">Holdings</h2>
+          <div className="lg:col-span-2 card bg-white shadow-sm border-gray-200">
+            <h2 className="font-bold text-gray-900 mb-4">Holdings</h2>
             {holdings.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-gray-500 text-xs uppercase">
+                    <tr className="text-gray-600 text-xs uppercase border-b border-gray-200">
                       <th className="text-left pb-3 font-medium">Asset</th>
                       <th className="text-right pb-3 font-medium">Qty</th>
                       <th className="text-right pb-3 font-medium">Avg Buy</th>
@@ -106,23 +106,23 @@ export default function Portfolio() {
                       <th className="text-right pb-3 font-medium">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-700/50">
+                  <tbody className="divide-y divide-gray-200">
                     {holdings.map((h) => {
                       const livePrice = prices[h.symbol]?.price || h.currentPrice;
                       const liveValue = livePrice * h.quantity;
                       const livePL = liveValue - h.totalInvested;
                       const livePLPct = ((livePL / h.totalInvested) * 100).toFixed(2);
                       return (
-                        <tr key={h.symbol} className="hover:bg-dark-200/50 transition-colors">
+                        <tr key={h.symbol} className="hover:bg-gray-50 transition-colors">
                           <td className="py-3">
-                            <p className="font-bold text-white">{h.symbol}</p>
+                            <p className="font-bold text-gray-900">{h.symbol}</p>
                             <p className="text-xs text-gray-500">{h.name}</p>
                           </td>
-                          <td className="py-3 text-right font-mono text-gray-300">{h.quantity}</td>
-                          <td className="py-3 text-right font-mono text-gray-400">${h.avgBuyPrice.toFixed(4)}</td>
-                          <td className="py-3 text-right font-mono text-white">${livePrice.toFixed(4)}</td>
-                          <td className="py-3 text-right font-mono text-white">${liveValue.toFixed(2)}</td>
-                          <td className={`py-3 text-right font-mono text-sm ${livePL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          <td className="py-3 text-right font-mono text-gray-700">{h.quantity}</td>
+                          <td className="py-3 text-right font-mono text-gray-600">${h.avgBuyPrice.toFixed(4)}</td>
+                          <td className="py-3 text-right font-mono text-gray-900">${livePrice.toFixed(4)}</td>
+                          <td className="py-3 text-right font-mono text-gray-900">${liveValue.toFixed(2)}</td>
+                          <td className={`py-3 text-right font-mono text-sm ${livePL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                             {livePL >= 0 ? '+' : ''}${livePL.toFixed(2)}
                             <span className="block text-xs">({livePL >= 0 ? '+' : ''}{livePLPct}%)</span>
                           </td>
@@ -150,8 +150,8 @@ export default function Portfolio() {
           </div>
 
           {/* Pie Chart */}
-          <div className="card">
-            <h2 className="font-bold text-white mb-4">Allocation</h2>
+          <div className="card bg-white shadow-sm border-gray-200">
+            <h2 className="font-bold text-gray-900 mb-4">Allocation</h2>
             {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
@@ -161,10 +161,10 @@ export default function Portfolio() {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ background: '#1e2130', border: '1px solid #374151', borderRadius: '12px', color: '#f3f4f6' }}
+                    contentStyle={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', color: '#111827', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
                     formatter={(val) => [`$${val.toFixed(2)}`, '']}
                   />
-                  <Legend formatter={(val) => <span style={{ color: '#9ca3af', fontSize: 12 }}>{val}</span>} />
+                  <Legend formatter={(val) => <span style={{ color: '#4b5563', fontSize: 12 }}>{val}</span>} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
@@ -174,15 +174,15 @@ export default function Portfolio() {
         </div>
 
         {/* Transaction History */}
-        <div className="card">
+        <div className="card bg-white shadow-sm border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-white">Transaction History</h2>
+            <h2 className="font-bold text-gray-900">Transaction History</h2>
             <div className="flex gap-2">
               {['all', 'buy', 'sell'].map((f) => (
                 <button
                   key={f}
                   onClick={() => setTxFilter(f)}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium capitalize transition-all ${txFilter === f ? 'bg-primary-500 text-white' : 'bg-dark-200 text-gray-400 hover:text-white'}`}
+                  className={`px-3 py-1 rounded-lg text-xs font-medium capitalize transition-all ${txFilter === f ? 'bg-primary-900 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:text-gray-900'}`}
                 >
                   {f}
                 </button>
@@ -193,7 +193,7 @@ export default function Portfolio() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-gray-500 text-xs uppercase">
+                  <tr className="text-gray-600 text-xs uppercase border-b border-gray-200">
                     <th className="text-left pb-3 font-medium">Asset</th>
                     <th className="text-left pb-3 font-medium">Type</th>
                     <th className="text-right pb-3 font-medium">Qty</th>
@@ -203,11 +203,11 @@ export default function Portfolio() {
                     <th className="text-right pb-3 font-medium">Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-700/50">
+                <tbody className="divide-y divide-gray-200">
                   {filteredTx.map((t) => (
-                    <tr key={t._id} className="hover:bg-dark-200/50">
+                    <tr key={t._id} className="hover:bg-gray-50">
                       <td className="py-3">
-                        <p className="font-bold text-white">{t.symbol}</p>
+                        <p className="font-bold text-gray-900">{t.symbol}</p>
                         <p className="text-xs text-gray-500">{t.name}</p>
                       </td>
                       <td className="py-3">
@@ -216,10 +216,10 @@ export default function Portfolio() {
                           {t.type.toUpperCase()}
                         </span>
                       </td>
-                      <td className="py-3 text-right font-mono text-gray-300">{t.quantity}</td>
-                      <td className="py-3 text-right font-mono text-gray-300">${t.price.toFixed(4)}</td>
-                      <td className="py-3 text-right font-mono text-white">${t.total.toFixed(2)}</td>
-                      <td className={`py-3 text-right font-mono text-sm ${t.profitLoss === null ? 'text-gray-500' : t.profitLoss >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      <td className="py-3 text-right font-mono text-gray-700">{t.quantity}</td>
+                      <td className="py-3 text-right font-mono text-gray-600">${t.price.toFixed(4)}</td>
+                      <td className="py-3 text-right font-mono text-gray-900">${t.total.toFixed(2)}</td>
+                      <td className={`py-3 text-right font-mono text-sm ${t.profitLoss === null ? 'text-gray-500' : t.profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {t.profitLoss !== null ? `${t.profitLoss >= 0 ? '+' : ''}$${t.profitLoss.toFixed(2)}` : '—'}
                       </td>
                       <td className="py-3 text-right text-gray-500 text-xs">

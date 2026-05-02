@@ -12,7 +12,7 @@ import { FiSearch, FiFilter } from 'react-icons/fi';
 const fetchHistory = async (symbol) => {
   const { data } = await api.get(`/market/${symbol}/history?days=30`);
   return data.data;
-};
+}
 
 export default function Market() {
   const { prices } = useSocket();
@@ -35,24 +35,24 @@ export default function Market() {
   });
 
   return (
-    <div className="min-h-screen bg-dark-300">
+    <div className="min-h-screen bg-gray-50">
       <MarketTicker />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-white">Market</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Market</h1>
           <p className="text-gray-500 text-sm mt-1">Live prices updated every 3 seconds</p>
         </div>
 
         {/* Chart Section */}
-        <div className="card mb-6">
+        <div className="card mb-6 bg-white shadow-sm border-gray-200">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <h2 className="font-bold text-white">{chartSymbol} — 30 Day Chart</h2>
+            <h2 className="font-bold text-gray-900">{chartSymbol} — 30 Day Chart</h2>
             <div className="flex gap-2 flex-wrap">
               {['AAPL', 'BTC', 'ETH', 'TSLA', 'NVDA', 'SOL'].map((sym) => (
                 <button
                   key={sym}
                   onClick={() => setChartSymbol(sym)}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${chartSymbol === sym ? 'bg-primary-500 text-white' : 'bg-dark-200 text-gray-400 hover:text-white'}`}
+                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${chartSymbol === sym ? 'bg-primary-900 text-white' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}
                 >
                   {sym}
                 </button>
@@ -62,16 +62,16 @@ export default function Market() {
           {history ? (
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={history}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e2130" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="date" tick={{ fill: '#6b7280', fontSize: 10 }} axisLine={false} tickLine={false}
                   tickFormatter={(v) => v.slice(5)} interval={4} />
                 <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} axisLine={false} tickLine={false}
                   tickFormatter={(v) => `$${v >= 1000 ? (v/1000).toFixed(1)+'k' : v.toFixed(2)}`} domain={['auto', 'auto']} />
                 <Tooltip
-                  contentStyle={{ background: '#1e2130', border: '1px solid #374151', borderRadius: '12px', color: '#f3f4f6' }}
+                  contentStyle={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', color: '#111827', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
                   formatter={(val) => [`$${Number(val).toFixed(4)}`, 'Close']}
                 />
-                <Line type="monotone" dataKey="close" stroke="#22c55e" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="close" stroke="#2563eb" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           ) : (
@@ -95,7 +95,7 @@ export default function Market() {
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all capitalize ${filter === f ? 'bg-primary-500 text-white' : 'btn-secondary'}`}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all capitalize ${filter === f ? 'bg-primary-900 text-white shadow-sm' : 'btn-secondary'}`}
               >
                 {f}
               </button>

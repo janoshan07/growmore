@@ -29,46 +29,46 @@ export default function AdminPanel() {
   ];
 
   return (
-    <div className="min-h-screen bg-dark-300">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
-            <FiShield className="text-purple-400 w-5 h-5" />
+          <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+            <FiShield className="text-purple-700 w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
-            <p className="text-gray-500 text-sm">Platform management & analytics</p>
+            <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
+            <p className="text-gray-600 text-sm">Platform management & analytics</p>
           </div>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {statCards.map((s) => (
-            <motion.div key={s.label} whileHover={{ y: -2 }} className="stat-card">
+            <motion.div key={s.label} whileHover={{ y: -2 }} className="stat-card bg-white shadow-sm border-gray-200">
               <div className="flex items-center justify-between">
                 <p className="text-xs text-gray-500 uppercase tracking-wider">{s.label}</p>
-                <s.icon className="w-4 h-4 text-purple-400" />
+                <s.icon className="w-4 h-4 text-purple-600" />
               </div>
-              <p className="text-3xl font-bold text-white mt-2">{s.value.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{s.value.toLocaleString()}</p>
             </motion.div>
           ))}
         </div>
 
         {/* Trade Volume */}
-        <div className="card mb-6">
+        <div className="card mb-6 bg-white shadow-sm border-gray-200">
           <p className="text-sm text-gray-500 uppercase tracking-wider">Total Trade Volume</p>
-          <p className="text-4xl font-bold font-mono text-purple-400 mt-1">
+          <p className="text-4xl font-bold font-mono text-purple-600 mt-1">
             ${(stats?.totalVolume || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </p>
         </div>
 
         {/* Users Table */}
-        <div className="card">
-          <h2 className="font-bold text-white mb-4">All Users</h2>
+        <div className="card bg-white shadow-sm border-gray-200">
+          <h2 className="font-bold text-gray-900 mb-4">All Users</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-gray-500 text-xs uppercase">
+                <tr className="text-gray-600 text-xs uppercase border-b border-gray-200">
                   <th className="text-left pb-3 font-medium">Name</th>
                   <th className="text-left pb-3 font-medium">Email</th>
                   <th className="text-left pb-3 font-medium">Role</th>
@@ -77,17 +77,17 @@ export default function AdminPanel() {
                   <th className="text-center pb-3 font-medium">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-700/50">
+              <tbody className="divide-y divide-gray-200">
                 {users?.map((u) => (
-                  <tr key={u._id} className="hover:bg-dark-200/50">
-                    <td className="py-3 font-semibold text-white">{u.name}</td>
-                    <td className="py-3 text-gray-400">{u.email}</td>
+                  <tr key={u._id} className="hover:bg-gray-50">
+                    <td className="py-3 font-semibold text-gray-900">{u.name}</td>
+                    <td className="py-3 text-gray-600">{u.email}</td>
                     <td className="py-3">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${u.role === 'admin' ? 'bg-purple-500/20 text-purple-400' : 'bg-gray-700 text-gray-400'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>
                         {u.role}
                       </span>
                     </td>
-                    <td className="py-3 text-right font-mono text-primary-400">
+                    <td className="py-3 text-right font-mono text-primary-700">
                       ${u.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </td>
                     <td className="py-3 text-gray-500 text-xs">
@@ -96,7 +96,7 @@ export default function AdminPanel() {
                     <td className="py-3 text-center">
                       <button
                         onClick={() => toggleUser(u._id, u.name)}
-                        className={`flex items-center gap-1 mx-auto text-xs px-3 py-1 rounded-full transition-all ${u.isActive ? 'bg-green-500/10 text-green-400 hover:bg-red-500/10 hover:text-red-400' : 'bg-red-500/10 text-red-400 hover:bg-green-500/10 hover:text-green-400'}`}
+                        className={`flex items-center gap-1 mx-auto text-xs px-3 py-1 rounded-full transition-all ${u.isActive ? 'bg-green-500/10 text-green-600 hover:bg-red-500/10 hover:text-red-600' : 'bg-red-500/10 text-red-600 hover:bg-green-500/10 hover:text-green-600'}`}
                       >
                         {u.isActive ? <FiToggleRight className="w-4 h-4" /> : <FiToggleLeft className="w-4 h-4" />}
                         {u.isActive ? 'Active' : 'Inactive'}

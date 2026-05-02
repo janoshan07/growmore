@@ -24,18 +24,18 @@ const fetchTransactions = async () => {
 };
 
 const StatCard = ({ title, value, sub, icon: Icon, positive, prefix = '' }) => (
-  <motion.div whileHover={{ y: -2 }} className="stat-card">
+  <motion.div whileHover={{ y: -2 }} className="stat-card bg-white shadow-sm border-gray-200">
     <div className="flex items-center justify-between">
       <p className="text-xs text-gray-500 uppercase tracking-wider">{title}</p>
-      <div className="w-8 h-8 bg-primary-500/10 rounded-lg flex items-center justify-center">
-        <Icon className="w-4 h-4 text-primary-400" />
+      <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+        <Icon className="w-4 h-4 text-primary-700" />
       </div>
     </div>
-    <p className="text-2xl font-bold font-mono text-white mt-2">
+    <p className="text-2xl font-bold font-mono text-gray-900 mt-2">
       {prefix}{typeof value === 'number' ? value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : value}
     </p>
     {sub !== undefined && (
-      <p className={`text-xs flex items-center gap-1 mt-1 ${positive ? 'text-green-400' : positive === false ? 'text-red-400' : 'text-gray-500'}`}>
+      <p className={`text-xs flex items-center gap-1 mt-1 ${positive ? 'text-green-600' : positive === false ? 'text-red-600' : 'text-gray-500'}`}>
         {positive === true && <FiTrendingUp className="w-3 h-3" />}
         {positive === false && <FiTrendingDown className="w-3 h-3" />}
         {sub}
@@ -62,15 +62,15 @@ export default function Dashboard() {
     : [];
 
   return (
-    <div className="min-h-screen bg-dark-300">
+    <div className="min-h-screen bg-gray-50">
       <MarketTicker />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-2xl font-bold text-white">
-            Good day, <span className="text-primary-400">{user?.name?.split(' ')[0]}</span> 👋
+          <h1 className="text-2xl font-bold text-gray-900">
+            Good day, <span className="text-primary-700">{user?.name?.split(' ')[0]}</span> 👋
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Here's your trading overview</p>
+          <p className="text-gray-600 text-sm mt-1">Here's your trading overview</p>
         </motion.div>
 
         {/* Stat Cards */}
@@ -97,9 +97,9 @@ export default function Dashboard() {
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Balance Chart */}
-          <div className="lg:col-span-2 card">
+          <div className="lg:col-span-2 card bg-white shadow-sm border-gray-200">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-white">Balance History</h2>
+              <h2 className="font-bold text-gray-900">Balance History</h2>
               <span className="text-xs text-gray-500">Last {chartData.length} trades</span>
             </div>
             {chartData.length > 0 ? (
@@ -107,17 +107,17 @@ export default function Dashboard() {
                 <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="balGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="name" tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v/1000).toFixed(1)}k`} />
                   <Tooltip
-                    contentStyle={{ background: '#1e2130', border: '1px solid #374151', borderRadius: '12px', color: '#f3f4f6' }}
+                    contentStyle={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', color: '#111827', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
                     formatter={(val) => [`$${val.toFixed(2)}`, 'Balance']}
                   />
-                  <Area type="monotone" dataKey="value" stroke="#22c55e" strokeWidth={2} fill="url(#balGrad)" />
+                  <Area type="monotone" dataKey="value" stroke="#2563eb" strokeWidth={2} fill="url(#balGrad)" />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
@@ -128,10 +128,10 @@ export default function Dashboard() {
           </div>
 
           {/* Holdings Summary */}
-          <div className="card">
+          <div className="card bg-white shadow-sm border-gray-200">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-white">Top Holdings</h2>
-              <Link to="/portfolio" className="text-xs text-primary-400 flex items-center gap-1 hover:underline">
+              <h2 className="font-bold text-gray-900">Top Holdings</h2>
+              <Link to="/portfolio" className="text-xs text-primary-700 flex items-center gap-1 hover:underline">
                 View all <FiArrowRight className="w-3 h-3" />
               </Link>
             </div>
@@ -144,12 +144,12 @@ export default function Dashboard() {
                   return (
                     <div key={h.symbol} className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-bold text-white">{h.symbol}</p>
+                        <p className="text-sm font-bold text-gray-900">{h.symbol}</p>
                         <p className="text-xs text-gray-500">{h.quantity} units</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-mono text-white">${(cp * h.quantity).toFixed(2)}</p>
-                        <p className={`text-xs ${pl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        <p className="text-sm font-mono text-gray-900">${(cp * h.quantity).toFixed(2)}</p>
+                        <p className={`text-xs ${pl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {pl >= 0 ? '+' : ''}${pl.toFixed(2)}
                         </p>
                       </div>
@@ -167,10 +167,10 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Transactions */}
-        <div className="card mt-6">
+        <div className="card mt-6 bg-white shadow-sm border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-white">Recent Transactions</h2>
-            <Link to="/portfolio" className="text-xs text-primary-400 flex items-center gap-1 hover:underline">
+            <h2 className="font-bold text-gray-900">Recent Transactions</h2>
+            <Link to="/portfolio" className="text-xs text-primary-700 flex items-center gap-1 hover:underline">
               View all <FiArrowRight className="w-3 h-3" />
             </Link>
           </div>
@@ -178,7 +178,7 @@ export default function Dashboard() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-gray-500 text-xs uppercase">
+                  <tr className="text-gray-500 text-xs uppercase border-b border-gray-200">
                     <th className="text-left pb-3 font-medium">Asset</th>
                     <th className="text-left pb-3 font-medium">Type</th>
                     <th className="text-right pb-3 font-medium">Quantity</th>
@@ -187,18 +187,18 @@ export default function Dashboard() {
                     <th className="text-right pb-3 font-medium">Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-700/50">
+                <tbody className="divide-y divide-gray-200">
                   {transactions.map((t) => (
-                    <tr key={t._id} className="hover:bg-dark-200/50">
-                      <td className="py-3 font-semibold text-white">{t.symbol}</td>
+                    <tr key={t._id} className="hover:bg-gray-50">
+                      <td className="py-3 font-semibold text-gray-900">{t.symbol}</td>
                       <td className="py-3">
                         <span className={t.type === 'buy' ? 'badge-green' : 'badge-red'}>
                           {t.type.toUpperCase()}
                         </span>
                       </td>
-                      <td className="py-3 text-right font-mono text-gray-300">{t.quantity}</td>
-                      <td className="py-3 text-right font-mono text-gray-300">${t.price.toFixed(2)}</td>
-                      <td className="py-3 text-right font-mono text-white">${t.total.toFixed(2)}</td>
+                      <td className="py-3 text-right font-mono text-gray-700">{t.quantity}</td>
+                      <td className="py-3 text-right font-mono text-gray-700">${t.price.toFixed(2)}</td>
+                      <td className="py-3 text-right font-mono text-gray-900">${t.total.toFixed(2)}</td>
                       <td className="py-3 text-right text-gray-500 text-xs">
                         {new Date(t.createdAt).toLocaleDateString()}
                       </td>
