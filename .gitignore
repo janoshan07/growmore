@@ -1,0 +1,80 @@
+# ─── Dependencies ────────────────────────────────────────────────────────────
+node_modules/
+.npm
+.yarn
+
+# ─── Environment Variables ────────────────────────────────────────────────────
+# NEVER commit real .env files
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.staging
+# Allow the example template to be committed
+!.env.example
+
+# ─── Build / Dist Outputs ─────────────────────────────────────────────────────
+dist/
+build/
+out/
+.vite/
+client/dist/
+client/build/
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─── OS Generated Files ───────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ─── Editor / IDE Config ──────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.history/
+
+# ─── Runtime & Cache ──────────────────────────────────────────────────────────
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+*.pid
+*.seed
+*.pid.lock
+
+# ─── Testing ──────────────────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ─── Misc ─────────────────────────────────────────────────────────────────────
+*.pem
+*.key
+*.cert
+.vercel
+.netlify
+
+# ─── Old / Temp files ─────────────────────────────────────────────────────────
+backend/
+*.tmp
+*.bak
+*.orig
+*.test.txt

@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-gray-700;
+  }
+  body {
+    @apply bg-dark-300 text-gray-100 font-sans antialiased;
+  }
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-dark-200;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded-full;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-dark-100 rounded-2xl border border-gray-700/50 p-5;
+  }
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95;
+  }
+  .btn-secondary {
+    @apply bg-dark-100 hover:bg-dark-200 border border-gray-600 text-gray-200 font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95;
+  }
+  .btn-danger {
+    @apply bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-semibold px-5 py-2.5 rounded-xl transition-all duration-200;
+  }
+  .input-field {
+    @apply w-full bg-dark-200 border border-gray-600 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200;
+  }
+  .badge-green {
+    @apply inline-flex items-center gap-1 bg-green-500/10 text-green-400 text-xs font-semibold px-2.5 py-1 rounded-full;
+  }
+  .badge-red {
+    @apply inline-flex items-center gap-1 bg-red-500/10 text-red-400 text-xs font-semibold px-2.5 py-1 rounded-full;
+  }
+  .stat-card {
+    @apply card flex flex-col gap-1 hover:border-primary-500/30 transition-all duration-300;
+  }
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+}
+
+/* Ticker animation */
+.ticker-wrap {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ticker-content {
+  display: inline-block;
+  animation: ticker 40s linear infinite;
+}
+.ticker-content:hover {
+  animation-play-state: paused;
+}
+
+/* Number flash on update */
+@keyframes flashGreen {
+  0%, 100% { color: inherit; }
+  50% { color: #22c55e; }
+}
+@keyframes flashRed {
+  0%, 100% { color: inherit; }
+  50% { color: #ef4444; }
+}
+.flash-green { animation: flashGreen 0.5s ease; }
+.flash-red { animation: flashRed 0.5s ease; }
