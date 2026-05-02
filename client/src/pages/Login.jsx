@@ -27,7 +27,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-dark-300 flex items-center justify-center p-4">
+    <div className="flex-grow w-full flex items-center justify-center p-4 py-12 relative">
       <div className="absolute inset-0 bg-gradient-to-br from-primary-900/20 via-dark-300 to-dark-400 pointer-events-none" />
 
       <motion.div

@@ -19,21 +19,7 @@ const stats = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-dark-300 overflow-hidden">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-            <FiTrendingUp className="text-white w-5 h-5" />
-          </div>
-          <span className="font-bold text-lg text-white">Grow<span className="text-primary-400">More</span></span>
-        </div>
-        <div className="flex gap-3">
-          <Link to="/login" className="btn-secondary text-sm py-2">Login</Link>
-          <Link to="/register" className="btn-primary text-sm py-2">Get Started</Link>
-        </div>
-      </header>
-
+    <div className="w-full overflow-hidden">
       {/* Hero */}
       <section className="relative max-w-7xl mx-auto px-6 pt-20 pb-32 text-center">
         {/* Background glow */}

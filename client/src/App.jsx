@@ -13,7 +13,8 @@ import Portfolio from './pages/Portfolio';
 import AdminPanel from './pages/AdminPanel';
 
 // Components
-import Navbar from './components/Navbar';
+import Header from './components/Header';
+import Footer from './components/Footer';
 
 /** Protected route wrapper */
 const PrivateRoute = ({ children }) => {
@@ -38,19 +39,22 @@ const PublicRoute = ({ children }) => {
 const AppRoutes = () => {
   const { user } = useAuth();
   return (
-    <>
-      {user && <Navbar />}
-      <Routes>
-        <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
-        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-        <Route path="/market" element={<PrivateRoute><Market /></PrivateRoute>} />
-        <Route path="/portfolio" element={<PrivateRoute><Portfolio /></PrivateRoute>} />
-        <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
-        <Route path="*" element={<Navigate to={user ? '/dashboard' : '/'} replace />} />
-      </Routes>
-    </>
+    <div className="min-h-screen flex flex-col bg-dark-300">
+      <Header />
+      <main className="flex-grow flex flex-col relative">
+        <Routes>
+          <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
+          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+          <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/market" element={<PrivateRoute><Market /></PrivateRoute>} />
+          <Route path="/portfolio" element={<PrivateRoute><Portfolio /></PrivateRoute>} />
+          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+          <Route path="*" element={<Navigate to={user ? '/dashboard' : '/'} replace />} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
   );
 };
 
