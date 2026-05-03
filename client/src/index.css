@@ -24,15 +24,78 @@
   .card {
     @apply bg-white rounded-2xl border border-gray-200 shadow-sm p-5;
   }
+
+  /* ── Primary Button ─────────────────────────────────── */
   .btn-primary {
-    @apply bg-primary-900 hover:bg-primary-800 text-white font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95 shadow-sm;
+    @apply relative overflow-hidden
+           bg-primary-900 text-white font-semibold
+           px-5 py-2.5 rounded-xl
+           shadow-sm shadow-primary-900/20
+           transition-all duration-300 ease-out
+           active:scale-95
+           hover:-translate-y-0.5
+           hover:shadow-lg hover:shadow-primary-900/30;
   }
+  /* shimmer sweep */
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(255,255,255,0.25) 50%,
+      transparent 100%
+    );
+    transition: left 0.55s ease;
+  }
+  .btn-primary:hover::before { left: 160%; }
+
+  /* ── Secondary Button ───────────────────────────────── */
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95 shadow-sm;
+    @apply relative overflow-hidden
+           bg-white border border-gray-300 text-gray-700 font-semibold
+           px-5 py-2.5 rounded-xl
+           shadow-sm
+           transition-all duration-300 ease-out
+           active:scale-95
+           hover:-translate-y-0.5
+           hover:border-primary-400 hover:text-primary-800
+           hover:shadow-md hover:shadow-primary-100/60;
   }
+  /* subtle inward glow on hover */
+  .btn-secondary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at 50% 140%, rgba(29,78,216,0.08) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .btn-secondary:hover::after { opacity: 1; }
+
+  /* ── Danger Button ──────────────────────────────────── */
   .btn-danger {
-    @apply bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-semibold px-5 py-2.5 rounded-xl transition-all duration-200;
+    @apply relative overflow-hidden
+           bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-semibold
+           px-5 py-2.5 rounded-xl
+           transition-all duration-200
+           active:scale-95
+           hover:-translate-y-0.5;
   }
+
+  /* ── Icon inside buttons – slide on hover ───────────── */
+  .btn-primary .btn-icon,
+  .btn-secondary .btn-icon {
+    @apply inline-block transition-transform duration-300;
+  }
+  .btn-primary:hover .btn-icon,
+  .btn-secondary:hover .btn-icon {
+    @apply translate-x-1;
+  }
+
   .input-field {
     @apply w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary-600 focus:ring-1 focus:ring-primary-600 transition-all duration-200 shadow-sm;
   }
