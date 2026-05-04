@@ -11,6 +11,11 @@ import Dashboard from './pages/Dashboard';
 import Market from './pages/Market';
 import Portfolio from './pages/Portfolio';
 import AdminPanel from './pages/AdminPanel';
+import About from './pages/About';
+import Plans from './pages/Plans';
+import HowItWorks from './pages/HowItWorks';
+import Ventures from './pages/Ventures';
+import Contact from './pages/Contact';
 
 // Components
 import Header from './components/Header';
@@ -45,6 +50,11 @@ const AppRoutes = () => {
       <main className="flex-grow flex flex-col relative">
         <Routes>
           <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
+          <Route path="/about" element={<About />} />
+          <Route path="/plans" element={<Plans />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/ventures" element={<Ventures />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />

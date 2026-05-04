@@ -1,286 +1,225 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { FiMenu, FiX, FiChevronDown } from 'react-icons/fi';
+import { FiMenu, FiX, FiChevronDown, FiLogOut, FiUser } from 'react-icons/fi';
 
-// Mega menu data
-const megaMenus = {
-  'who-we-are': {
-    title: 'Who We Are',
-    link: '/who-we-are',
-    sublinks: [
-      { to: '/who-we-are/culture', label: 'Our Culture' },
-      { to: '/who-we-are/leadership', label: 'Leadership Team' },
-      { to: '/who-we-are/civic', label: 'Civic Leadership' },
-      { to: '/who-we-are/locations', label: 'Office Locations' },
-    ]
-  },
-  'what-we-do': {
-    title: 'What We Do',
-    link: '/what-we-do',
-    sublinks: [
-      { to: '/what-we-do/commodities', label: 'Commodities' },
-      { to: '/what-we-do/credit', label: 'Credit and Convertibles' },
-      { to: '/what-we-do/equities', label: 'Equities' },
-      { to: '/what-we-do/fixed-income', label: 'Fixed Income and Macro' },
-      { to: '/what-we-do/quant', label: 'Global Quantitative Strategies' },
-    ]
-  }
-};
+const publicLinks = [
+  { to: '/',             label: 'Home' },
+  { to: '/about',        label: 'About' },
+  { to: '/plans',        label: 'Investment Plans' },
+  { to: '/how-it-works', label: 'How It Works' },
+  { to: '/ventures',     label: 'Ventures Builders' },
+  { to: '/contact',      label: 'Contact' },
+];
+
+const privateLinks = [
+  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/market',    label: 'Market' },
+  { to: '/portfolio', label: 'Portfolio' },
+];
 
 export default function Header() {
   const { user, logout } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [hoveredMenu, setHoveredMenu] = useState(null);
+  const location  = useLocation();
+  const navigate  = useNavigate();
+  const [mobileOpen,    setMobileOpen]    = useState(false);
+  const [dropdownOpen,  setDropdownOpen]  = useState(false);
+  const [scrolled,      setScrolled]      = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-    setProfileDropdownOpen(false);
-  };
+  // shrink / darken on scroll
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-  // Public links replicating the Citadel style exactly
-  const publicLinks = [
-    { to: '/who-we-are', label: 'Who We Are' },
-    { to: '/what-we-do', label: 'What We Do' },
-    { to: '/news', label: 'News' },
-    { to: '/careers', label: 'Careers' },
-  ];
+  // close mobile menu on route change
+  useEffect(() => { setMobileOpen(false); setDropdownOpen(false); }, [location.pathname]);
 
-  // Private links for the trading app
-  const privateLinks = [
-    { to: '/dashboard', label: 'Dashboard' },
-    { to: '/market', label: 'Market' },
-    { to: '/portfolio', label: 'Portfolio' },
-  ];
-
+  const handleLogout = () => { logout(); navigate('/'); };
   const navLinks = user ? privateLinks : publicLinks;
 
   return (
-    <header 
-      className="sticky top-0 z-50 bg-white border-b border-gray-200 transition-all duration-300 relative"
-      onMouseLeave={() => setHoveredMenu(null)}
-    >
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center h-20">
-          
-          {/* Logo — Grow More Lanka */}
-          <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-3 group mr-auto select-none">
-            {/* Circular emblem */}
-            <div className="relative w-11 h-11 flex-shrink-0">
-              <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-md group-hover:drop-shadow-lg transition-all duration-300">
-                {/* Outer circle */}
-                <circle cx="22" cy="22" r="21" fill="#0f1c3f" stroke="#c9a84c" strokeWidth="1.5"/>
-                {/* G letter */}
-                <text x="9" y="28" fontFamily="Georgia, serif" fontWeight="700" fontSize="18" fill="#c9a84c" letterSpacing="-0.5">G</text>
-                {/* Bar chart bars */}
-                <rect x="26" y="23" width="3.5" height="7" rx="0.8" fill="#c9a84c"/>
-                <rect x="30.5" y="19" width="3.5" height="11" rx="0.8" fill="#c9a84c"/>
-                <rect x="35" y="15" width="3.5" height="15" rx="0.8" fill="#c9a84c"/>
-              </svg>
-            </div>
+    <>
+      <header
+        className={`sticky top-0 z-50 transition-all duration-400 ${
+          scrolled
+            ? 'bg-[#07071a]/95 backdrop-blur-xl shadow-2xl shadow-black/40'
+            : 'bg-[#07071a]/80 backdrop-blur-md'
+        }`}
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+      >
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center h-[72px] gap-6">
 
-            {/* Brand text */}
-            <div className="flex flex-col leading-none">
-              <span
-                className="text-[18px] font-black text-[#0f1c3f] tracking-widest uppercase group-hover:text-primary-700 transition-colors duration-200"
-                style={{ fontFamily: 'Inter, sans-serif', letterSpacing: '0.12em' }}
-              >
-                GROW MORE
-              </span>
-              <span
-                className="text-[11px] font-bold tracking-[0.3em] text-[#c9a84c] uppercase mt-0.5"
-                style={{ letterSpacing: '0.32em' }}
-              >
-                LANKA
-              </span>
-            </div>
-          </Link>
+            {/* ── Logo ─────────────────────────────── */}
+            <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-3 group select-none flex-shrink-0">
+              <div className="relative w-10 h-10">
+                <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"
+                  className="w-full h-full drop-shadow-lg group-hover:scale-105 transition-transform duration-300">
+                  <circle cx="22" cy="22" r="21" fill="#0f1c3f" stroke="#c9a84c" strokeWidth="1.5"/>
+                  <text x="9" y="28" fontFamily="Georgia,serif" fontWeight="700" fontSize="18" fill="#c9a84c">G</text>
+                  <rect x="26" y="23" width="3.5" height="7"  rx="0.8" fill="#c9a84c"/>
+                  <rect x="30.5" y="19" width="3.5" height="11" rx="0.8" fill="#c9a84c"/>
+                  <rect x="35"   y="15" width="3.5" height="15" rx="0.8" fill="#c9a84c"/>
+                </svg>
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="text-[15px] font-black text-white tracking-widest uppercase" style={{ letterSpacing: '0.12em' }}>GROW MORE</span>
+                <span className="text-[9px] font-bold text-[#c9a84c] uppercase" style={{ letterSpacing: '0.35em' }}>LANKA</span>
+              </div>
+            </Link>
 
-          {/* Center Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 mx-auto absolute left-1/2 -translate-x-1/2 h-full">
-            {navLinks.map(({ to, label }) => {
-              const menuId = label.toLowerCase().replace(/ /g, '-');
-              return (
-                <div
-                  key={to}
-                  className="h-full flex items-center border-b-2 border-transparent hover:border-primary-900 transition-colors cursor-pointer"
-                  onMouseEnter={() => setHoveredMenu(['who-we-are', 'what-we-do'].includes(menuId) ? menuId : null)}
-                >
+            {/* ── Desktop Nav ──────────────────────── */}
+            <nav className="hidden lg:flex items-center gap-1 mx-auto">
+              {navLinks.map(({ to, label }) => {
+                const isActive = location.pathname === to;
+                return (
                   <Link
+                    key={to}
                     to={to}
-                    onClick={() => setHoveredMenu(null)}
-                    className={`text-sm font-medium transition-colors duration-200
-                      ${location.pathname === to
-                        ? 'text-primary-900 font-bold'
-                        : 'text-primary-900 hover:text-primary-600'
+                    className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap group
+                      ${isActive
+                        ? 'text-[#c9a84c]'
+                        : 'text-white/65 hover:text-white'
                       }`}
                   >
-                    {label}
+                    {/* active pill background */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="activePill"
+                        className="absolute inset-0 rounded-lg"
+                        style={{ background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.25)' }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                      />
+                    )}
+                    {/* hover bg */}
+                    <span className="absolute inset-0 rounded-lg bg-white/0 group-hover:bg-white/05 transition-colors duration-200" />
+                    <span className="relative z-10">{label}</span>
                   </Link>
-                </div>
-              );
-            })}
-          </nav>
+                );
+              })}
+            </nav>
 
-          {/* Right Section: Client Login or Profile */}
-          <div className="hidden md:flex items-center ml-auto h-full">
-            {!user ? (
-              <Link to="/login" className="text-sm font-medium text-primary-900 hover:text-primary-600 transition-colors">
-                Client Login
-              </Link>
-            ) : (
-              <div className="relative h-full flex items-center">
-                <button
-                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-2 text-sm font-medium text-primary-900 hover:text-primary-600 transition-colors focus:outline-none"
-                >
-                  {user.name}
-                  <FiChevronDown className={`w-4 h-4 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {/* Profile Dropdown */}
-                <AnimatePresence>
-                  {profileDropdownOpen && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setProfileDropdownOpen(false)}></div>
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute right-0 top-[70%] mt-4 w-48 bg-white border border-gray-200 shadow-lg z-50 py-2"
-                      >
-                        <div className="px-4 py-2 border-b border-gray-100 mb-1">
-                          <p className="text-xs text-gray-500 uppercase tracking-wider">Balance</p>
-                          <p className="text-sm font-semibold text-primary-900">
-                            ${user.balance?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                          </p>
-                        </div>
-                        <button
-                          onClick={handleLogout}
-                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors"
-                        >
-                          Logout
-                        </button>
-                      </motion.div>
-                    </>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden ml-auto text-primary-900 hover:text-primary-600 p-2"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mega Menu Dropdown */}
-      <AnimatePresence>
-        {hoveredMenu && megaMenus[hoveredMenu] && !user && (
-          <motion.div
-            initial={{ opacity: 0, y: -5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 w-full bg-[#f8f9fa] shadow-xl z-40 border-t border-gray-200"
-          >
-            <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 py-14 relative">
-              <button 
-                onClick={() => setHoveredMenu(null)}
-                className="absolute top-8 right-0 text-[#1a4b8b] hover:text-primary-600 p-2"
-              >
-                <FiX className="w-6 h-6 stroke-[3]" />
-              </button>
-              
-              <div className="grid grid-cols-2 gap-16 items-start">
-                {/* Left Side */}
-                <div className="flex flex-col gap-6 pl-10">
-                  <h2 className="text-[42px] text-[#1a4b8b]" style={{ fontFamily: 'Times New Roman, serif' }}>
-                    {megaMenus[hoveredMenu].title}
-                  </h2>
-                  <Link 
-                    to={megaMenus[hoveredMenu].link} 
-                    onClick={() => setHoveredMenu(null)}
-                    className="bg-[#1a4b8b] hover:bg-[#153a6b] text-white px-7 py-3 w-fit text-sm font-medium transition-colors"
-                  >
-                    Learn More
-                  </Link>
-                </div>
-                
-                {/* Right Side */}
-                <div className="flex flex-col gap-5 pt-3">
-                  {megaMenus[hoveredMenu].sublinks.map(link => (
-                    <Link 
-                      key={link.label} 
-                      to={link.to} 
-                      onClick={() => setHoveredMenu(null)}
-                      className="text-[15px] font-medium text-[#1a4b8b] hover:text-primary-600 transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-t border-gray-200 overflow-hidden absolute top-full left-0 w-full"
-          >
-            <div className="px-6 py-4 flex flex-col gap-4 shadow-md">
-              {navLinks.map(({ to, label }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  onClick={() => setMobileOpen(false)}
-                  className="text-base font-medium text-primary-900"
-                >
-                  {label}
-                </Link>
-              ))}
-              
-              <div className="pt-4 border-t border-gray-100 mt-2">
-                {!user ? (
-                  <Link 
-                    to="/login" 
-                    onClick={() => setMobileOpen(false)} 
-                    className="text-base font-medium text-primary-900"
-                  >
+            {/* ── Right side ───────────────────────── */}
+            <div className="hidden lg:flex items-center gap-3 ml-auto flex-shrink-0">
+              {!user ? (
+                <>
+                  <Link to="/login"
+                    className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors">
                     Client Login
                   </Link>
-                ) : (
+                  <Link to="/register"
+                    className="px-5 py-2 rounded-xl text-sm font-bold text-[#07071a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#c9a84c]/30"
+                    style={{ background: 'linear-gradient(135deg, #c9a84c, #e8c96b)' }}>
+                    Get Started
+                  </Link>
+                </>
+              ) : (
+                <div className="relative">
                   <button
-                    onClick={() => { handleLogout(); setMobileOpen(false); }}
-                    className="text-base font-medium text-red-600 text-left w-full"
+                    onClick={() => setDropdownOpen(o => !o)}
+                    className="flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-medium text-white border border-white/10 bg-white/05 hover:bg-white/10 hover:border-white/20 transition-all"
                   >
-                    Logout
+                    <div className="w-6 h-6 rounded-full bg-[#c9a84c]/20 border border-[#c9a84c]/40 flex items-center justify-center">
+                      <FiUser className="w-3 h-3 text-[#c9a84c]" />
+                    </div>
+                    <span>{user.name}</span>
+                    <FiChevronDown className={`w-3.5 h-3.5 text-white/50 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
-                )}
-              </div>
+
+                  <AnimatePresence>
+                    {dropdownOpen && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setDropdownOpen(false)} />
+                        <motion.div
+                          initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                          transition={{ duration: 0.18 }}
+                          className="absolute right-0 mt-2 w-52 rounded-2xl overflow-hidden z-50 shadow-2xl shadow-black/60"
+                          style={{ background: '#0f1320', border: '1px solid rgba(255,255,255,0.1)' }}
+                        >
+                          <div className="px-4 py-3.5 border-b border-white/08">
+                            <p className="text-xs text-white/40 uppercase tracking-wider mb-0.5">Balance</p>
+                            <p className="font-bold text-[#c9a84c]">
+                              ${user.balance?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                            </p>
+                          </div>
+                          <div className="p-2">
+                            <button
+                              onClick={handleLogout}
+                              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                            >
+                              <FiLogOut className="w-4 h-4" /> Logout
+                            </button>
+                          </div>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+
+            {/* ── Mobile hamburger ─────────────────── */}
+            <button
+              className="lg:hidden ml-auto p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/08 transition-all"
+              onClick={() => setMobileOpen(o => !o)}
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Mobile Menu ────────────────────────── */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="lg:hidden overflow-hidden"
+              style={{ borderTop: '1px solid rgba(255,255,255,0.07)', background: '#0a0a1f' }}
+            >
+              <div className="px-4 py-5 flex flex-col gap-1">
+                {navLinks.map(({ to, label }) => {
+                  const isActive = location.pathname === to;
+                  return (
+                    <Link key={to} to={to}
+                      className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                        isActive ? 'text-[#c9a84c] bg-[#c9a84c]/10' : 'text-white/70 hover:text-white hover:bg-white/05'
+                      }`}>
+                      {label}
+                    </Link>
+                  );
+                })}
+
+                <div className="pt-3 mt-2 border-t border-white/08 flex flex-col gap-2">
+                  {!user ? (
+                    <>
+                      <Link to="/login" className="px-4 py-2.5 text-sm font-medium text-white/70 hover:text-white transition-colors">Client Login</Link>
+                      <Link to="/register"
+                        className="px-4 py-2.5 rounded-xl text-sm font-bold text-center text-[#07071a]"
+                        style={{ background: 'linear-gradient(135deg,#c9a84c,#e8c96b)' }}>
+                        Get Started
+                      </Link>
+                    </>
+                  ) : (
+                    <button onClick={handleLogout}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-colors">
+                      <FiLogOut className="w-4 h-4" /> Logout
+                    </button>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+    </>
   );
 }

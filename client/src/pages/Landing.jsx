@@ -1,145 +1,266 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { FiTrendingUp, FiShield, FiZap, FiBarChart2, FiArrowRight } from 'react-icons/fi';
-import CountUp from 'react-countup';
+import { motion } from 'framer-motion';
+import { FiArrowRight, FiShield, FiTrendingUp, FiZap, FiBarChart2 } from 'react-icons/fi';
 
-const features = [
-  { icon: FiTrendingUp, title: 'Real-Time Markets', desc: 'Live price feeds for stocks and crypto with WebSocket technology.' },
-  { icon: FiShield, title: 'Secure & Safe', desc: 'JWT authentication with encrypted data and secure API endpoints.' },
-  { icon: FiZap, title: 'Instant Trades', desc: 'Execute buy and sell orders instantly with virtual balance.' },
-  { icon: FiBarChart2, title: 'Analytics Dashboard', desc: 'Track your P&L, portfolio value, and trading history visually.' },
-];
+/* ─── Globe Canvas ───────────────────────────────────────────── */
+function GlobeCanvas() {
+  const canvasRef = useRef(null);
 
-const stats = [
-  { value: 14, suffix: '+', label: 'Assets Available' },
-  { value: 10000, prefix: '$', suffix: '', label: 'Starting Balance' },
-  { value: 3, suffix: 's', label: 'Price Update Speed' },
-  { value: 100, suffix: '%', label: 'Free to Use' },
-];
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
-const TiltCard = ({ children, className = "" }) => {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
+    let animId;
+    let angle = 0;
+    let stars = [];
 
-  const rotateX = useTransform(y, [-150, 150], [15, -15]);
-  const rotateY = useTransform(x, [-150, 150], [-15, 15]);
+    const resize = () => {
+      canvas.width  = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      // regenerate stars on resize
+      stars = Array.from({ length: 220 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.4,
+        a: Math.random(),
+      }));
+    };
 
-  function handleMouse(event) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const offsetX = event.clientX - rect.left - rect.width / 2;
-    const offsetY = event.clientY - rect.top - rect.height / 2;
-    x.set(offsetX);
-    y.set(offsetY);
-  }
+    resize();
+    window.addEventListener('resize', resize);
 
-  function handleMouseLeave() {
-    x.set(0);
-    y.set(0);
-  }
+    // Globe parameters
+    const ROWS = 22;
+    const COLS = 50;
+
+    function project3D(lat, lon, rotY, cx, cy, radius) {
+      const phi   = (lat * Math.PI) / 180;
+      const theta = (lon * Math.PI) / 180 + rotY;
+      const x3 = radius * Math.cos(phi) * Math.sin(theta);
+      const y3 = radius * Math.sin(phi);
+      const z3 = radius * Math.cos(phi) * Math.cos(theta);
+      return { x: cx + x3, y: cy - y3, z: z3 };
+    }
+
+    function draw() {
+      const W = canvas.width;
+      const H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      /* ── Starfield ── */
+      stars.forEach(s => {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${s.a * 0.7})`;
+        ctx.fill();
+      });
+
+      const cx     = W * 0.5;
+      const cy     = H * 0.56;
+      const radius = Math.min(W, H) * 0.41;
+
+      /* ── Globe outer glow ── */
+      const glow = ctx.createRadialGradient(cx, cy, radius * 0.3, cx, cy, radius * 1.2);
+      glow.addColorStop(0,   'rgba(120, 40, 220, 0.22)');
+      glow.addColorStop(0.5, 'rgba(100, 20, 200, 0.12)');
+      glow.addColorStop(1,   'rgba(60,  0, 140, 0)');
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius * 1.2, 0, Math.PI * 2);
+      ctx.fillStyle = glow;
+      ctx.fill();
+
+      /* ── Globe base fill ── */
+      const base = ctx.createRadialGradient(cx - radius * 0.3, cy - radius * 0.3, 0, cx, cy, radius);
+      base.addColorStop(0,   'rgba(110, 40, 200, 0.85)');
+      base.addColorStop(0.5, 'rgba(70,  15, 160, 0.80)');
+      base.addColorStop(1,   'rgba(30,   5, 100, 0.90)');
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fillStyle = base;
+      ctx.fill();
+
+      /* ── Dot grid (sphere surface) ── */
+      const points = [];
+      for (let row = 0; row < ROWS; row++) {
+        const lat = -90 + (180 / ROWS) * row;
+        const colCount = Math.max(1, Math.round(COLS * Math.cos((lat * Math.PI) / 180)));
+        for (let col = 0; col < colCount; col++) {
+          const lon = -180 + (360 / colCount) * col;
+          points.push(project3D(lat, lon, angle, cx, cy, radius));
+        }
+      }
+
+      // sort back-to-front
+      points.sort((a, b) => a.z - b.z);
+
+      points.forEach(p => {
+        const visible = p.z > -radius * 0.05; // cull back half (slightly)
+        const brightness = (p.z + radius) / (2 * radius); // 0-1
+        const alpha = visible ? 0.25 + brightness * 0.65 : 0;
+        if (alpha < 0.02) return;
+
+        const dotR = 1.1 + brightness * 1.5;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, dotR, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200, 160, 255, ${alpha})`;
+        ctx.fill();
+      });
+
+      /* ── Equatorial ring ── */
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(1, 0.22);
+      ctx.beginPath();
+      ctx.arc(0, 0, radius * 1.18, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(180, 100, 255, 0.28)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+
+      /* ── Rim highlight ── */
+      const rim = ctx.createRadialGradient(cx + radius * 0.6, cy - radius * 0.5, 0, cx, cy, radius);
+      rim.addColorStop(0,   'rgba(220,180,255,0.18)');
+      rim.addColorStop(0.7, 'rgba(120,60,220,0.06)');
+      rim.addColorStop(1,   'rgba(0,0,0,0)');
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fillStyle = rim;
+      ctx.fill();
+
+      angle += 0.004;
+      animId = requestAnimationFrame(draw);
+    }
+
+    draw();
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+    };
+  }, []);
 
   return (
-    <motion.div
-      style={{ perspective: 1200 }}
-      className={`relative ${className}`}
-    >
-      <motion.div
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        onMouseMove={handleMouse}
-        onMouseLeave={handleMouseLeave}
-        whileHover={{ scale: 1.05 }}
-        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-        className="w-full h-full"
-      >
-        <div className="card bg-white shadow-sm hover:shadow-xl transition-shadow duration-300 h-full border border-gray-100 flex flex-col items-center justify-center relative overflow-hidden group">
-          {/* Subtle glare effect */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/40 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none transform -translate-x-full group-hover:translate-x-full" />
-          
-          <div style={{ transform: "translateZ(40px)", transformStyle: "preserve-3d" }} className="w-full flex flex-col items-center">
-            {children}
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full"
+      style={{ display: 'block' }}
+    />
   );
-};
+}
 
+/* ─── Stats ─────────────────────────────────────────────────── */
+const stats = [
+  { value: '50%', label: 'Yearly Return' },
+  { value: 'LKR 300K', label: 'Min. Investment' },
+  { value: '100%', label: 'Capital Secured' },
+  { value: '10Y', label: 'Wealth Plan' },
+];
+
+/* ─── Features ──────────────────────────────────────────────── */
+const features = [
+  { icon: FiTrendingUp, title: 'High Returns', desc: 'Earn up to 50% yearly return with our Fixed 1-Year Plan.' },
+  { icon: FiShield,     title: 'Capital Protected', desc: 'Your capital is fully secured with an official signed agreement.' },
+  { icon: FiZap,        title: 'Monthly Payouts', desc: 'Receive 2.5–3% monthly returns directly to your account.' },
+  { icon: FiBarChart2,  title: 'Long-Term Wealth', desc: 'Build generational wealth with our 10-Year Wealth Plan.' },
+];
+
+/* ─── Landing Page ───────────────────────────────────────────── */
 export default function Landing() {
   return (
-    <div className="w-full overflow-hidden bg-gray-50 perspective-1000">
-      {/* Hero */}
-      <section className="relative max-w-7xl mx-auto px-6 pt-20 pb-32 text-center">
-        {/* Animated 3D Background Elements */}
-        <motion.div 
-          animate={{ y: [0, -30, 0], rotate: [0, 10, -10, 0], scale: [1, 1.05, 1] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-primary-200/50 rounded-full blur-3xl pointer-events-none" 
+    <div className="w-full overflow-hidden" style={{ background: '#07071a' }}>
+
+      {/* ── Hero ──────────────────────────────────────────────── */}
+      <section className="relative min-h-[92vh] flex flex-col items-center justify-center overflow-hidden">
+        {/* Globe canvas fills the full hero */}
+        <GlobeCanvas />
+
+        {/* Dark vignette overlay */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse 80% 60% at 50% 100%, transparent 0%, #07071a 70%)',
+          }}
         />
-        <motion.div 
-          animate={{ y: [0, 40, 0], rotate: [0, -15, 15, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-blue-200/40 rounded-full blur-3xl pointer-events-none" 
+        <div className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse 50% 40% at 50% 0%, #07071a 0%, transparent 100%)',
+          }}
         />
 
-        <motion.div 
-          initial={{ opacity: 0, y: 30, rotateX: 20 }} 
-          animate={{ opacity: 1, y: 0, rotateX: 0 }} 
-          transition={{ duration: 0.8, type: "spring" }}
-          style={{ transformStyle: "preserve-3d" }}
-          className="relative z-10"
-        >
-          <span className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md border border-primary-200 shadow-sm text-primary-800 text-sm font-medium px-4 py-1.5 rounded-full mb-6 transform hover:scale-105 transition-transform cursor-default">
-            <span className="w-2 h-2 bg-primary-600 rounded-full animate-pulse" />
-            Live Trading Simulation
-          </span>
-          <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-tight mb-6 tracking-tight">
-            Trade Smarter,<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-700 to-[#00e5ff]">
-              Grow Faster
-            </span>
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-10">
-            Practice trading stocks and crypto with $10,000 virtual balance. Real market data, zero real risk.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center relative z-10">
-            <Link to="/register" className="btn-primary flex items-center gap-2 text-base px-8 py-3 shadow-lg hover:shadow-primary-500/30 transform hover:-translate-y-1 transition-all">
-              Start Trading Free <FiArrowRight />
-            </Link>
-            <Link to="/login" className="btn-secondary flex items-center gap-2 text-base px-8 py-3 transform hover:-translate-y-1 transition-all">
-              Login to Account
-            </Link>
-          </div>
-        </motion.div>
+        {/* Hero content — centered overlay */}
+        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto mt-[-40px]">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+          >
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 border border-purple-500/40 bg-purple-900/20 text-purple-300 text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-8 backdrop-blur-sm">
+              <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse" />
+              Grow More Lanka Investment Consultancy
+            </div>
 
-        {/* 3D Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-24 relative z-10"
-        >
-          {stats.map((s) => (
-            <TiltCard key={s.label} className="h-[140px]">
-              <p className="text-4xl font-black text-primary-700 font-mono tracking-tight shadow-primary-900/10" style={{ transform: "translateZ(20px)" }}>
-                {s.prefix}<CountUp end={s.value} duration={2} enableScrollSpy />{s.suffix}
-              </p>
-              <p className="text-sm text-gray-500 mt-2 font-medium uppercase tracking-wider" style={{ transform: "translateZ(10px)" }}>{s.label}</p>
-            </TiltCard>
-          ))}
-        </motion.div>
+            {/* Headline */}
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-[1.05] mb-6 tracking-tight">
+              Today Invest,<br />
+              <span style={{
+                background: 'linear-gradient(135deg, #c9a84c 0%, #e8c96b 40%, #9f6ef5 80%, #c9a84c 100%)',
+                backgroundSize: '200% auto',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                animation: 'shimmerText 4s linear infinite',
+              }}>
+                Tomorrow Grow.
+              </span>
+            </h1>
+
+            {/* Sub text */}
+            <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+              Sri Lanka's most trusted investment consultancy — delivering fixed, high-return investment plans with full transparency and official agreements.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link to="/plans"
+                className="relative overflow-hidden inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-[#07071a] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl text-base"
+                style={{ background: 'linear-gradient(135deg, #c9a84c, #e8c96b)' }}>
+                Start Investing <FiArrowRight className="btn-icon" />
+              </Link>
+              <Link to="/contact"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-white border border-white/20 bg-white/8 backdrop-blur-sm hover:bg-white/15 hover:border-white/40 transition-all duration-300 hover:-translate-y-0.5 text-base">
+                Contact Now
+              </Link>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
-      {/* 3D Features */}
-      <section className="max-w-7xl mx-auto px-6 pb-32 relative z-10">
+      {/* ── Stats bar ─────────────────────────────────────────── */}
+      <section className="relative z-10 py-10 px-6" style={{ background: 'rgba(255,255,255,0.03)', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
         >
-          <h2 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight">Everything you need to trade</h2>
-          <p className="text-gray-600 text-lg">A complete trading platform built for learners and enthusiasts.</p>
+          {stats.map((s, i) => (
+            <motion.div key={s.label} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ delay: i * 0.1 }} viewport={{ once: true }}>
+              <p className="text-3xl md:text-4xl font-black" style={{ color: '#c9a84c' }}>{s.value}</p>
+              <p className="text-white/50 text-sm mt-1 font-medium uppercase tracking-wider">{s.label}</p>
+            </motion.div>
+          ))}
         </motion.div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      </section>
+
+      {/* ── Features ──────────────────────────────────────────── */}
+      <section className="relative z-10 max-w-6xl mx-auto px-6 py-24">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <span className="text-xs font-bold uppercase tracking-widest text-purple-400 mb-3 block">Why Choose Us</span>
+          <h2 className="text-3xl md:text-5xl font-black text-white mb-4">Built for Real Wealth</h2>
+          <p className="text-white/50 text-lg max-w-xl mx-auto">Professional investment management with transparent returns and guaranteed agreements.</p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
           {features.map((f, i) => (
             <motion.div
               key={f.title}
@@ -147,39 +268,69 @@ export default function Landing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
+              className="group rounded-2xl p-7 border transition-all duration-300 hover:-translate-y-1"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'rgba(150,80,255,0.10)';
+                e.currentTarget.style.border = '1px solid rgba(200,160,255,0.25)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                e.currentTarget.style.border = '1px solid rgba(255,255,255,0.08)';
+              }}
             >
-              <TiltCard className="h-[220px]">
-                <div 
-                  className="w-14 h-14 bg-gradient-to-br from-primary-50 to-primary-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300"
-                  style={{ transform: "translateZ(30px)" }}
-                >
-                  <f.icon className="text-primary-700 w-6 h-6 drop-shadow-md" />
-                </div>
-                <h3 className="font-bold text-gray-900 text-lg mb-3" style={{ transform: "translateZ(20px)" }}>{f.title}</h3>
-                <p className="text-sm text-gray-600 px-4 leading-relaxed" style={{ transform: "translateZ(10px)" }}>{f.desc}</p>
-              </TiltCard>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style={{ background: 'rgba(150,80,255,0.15)' }}>
+                <f.icon className="w-5 h-5" style={{ color: '#c9a84c' }} />
+              </div>
+              <h3 className="text-white font-bold text-lg mb-2">{f.title}</h3>
+              <p className="text-white/50 text-sm leading-relaxed">{f.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* 3D CTA */}
-      <section className="max-w-5xl mx-auto px-6 pb-32 text-center relative z-10">
-        <TiltCard className="p-1">
-          <div className="w-full bg-gradient-to-br from-[#f8f9fa] to-white rounded-2xl p-12 relative overflow-hidden border-0">
-            {/* Inner background glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-100 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-            
-            <h2 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight" style={{ transform: "translateZ(40px)" }}>Ready to start growing?</h2>
-            <p className="text-gray-600 mb-8 text-lg" style={{ transform: "translateZ(20px)" }}>Join now and get $10,000 virtual balance to start trading today.</p>
-            <div style={{ transform: "translateZ(50px)" }}>
-              <Link to="/register" className="btn-primary inline-flex items-center gap-2 px-10 py-4 text-lg shadow-xl hover:shadow-primary-500/40 transform hover:-translate-y-1 transition-all">
-                Create Free Account <FiArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
+      {/* ── CTA Section ───────────────────────────────────────── */}
+      <section className="relative z-10 pb-24 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-4xl mx-auto rounded-3xl p-12 text-center relative overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, rgba(120,40,220,0.25) 0%, rgba(30,10,80,0.6) 100%)',
+            border: '1px solid rgba(200,150,255,0.2)',
+          }}
+        >
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ background: 'radial-gradient(ellipse at 50% -20%, rgba(150,80,255,0.3) 0%, transparent 70%)' }} />
+          <h2 className="text-3xl md:text-5xl font-black text-white mb-4 relative z-10">Ready to Grow Your Wealth?</h2>
+          <p className="text-white/60 mb-8 text-lg relative z-10">
+            Join hundreds of clients who trust Grow More Lanka for transparent, high-return investments.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center relative z-10">
+            <Link to="/plans"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-[#07071a] transition-all hover:-translate-y-0.5 shadow-xl text-base"
+              style={{ background: 'linear-gradient(135deg, #c9a84c, #e8c96b)' }}>
+              View Investment Plans <FiArrowRight />
+            </Link>
+            <Link to="/contact"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-white border border-white/20 bg-white/8 hover:bg-white/15 transition-all hover:-translate-y-0.5 text-base">
+              Talk to an Advisor
+            </Link>
           </div>
-        </TiltCard>
+        </motion.div>
       </section>
+
+      {/* ── Shimmer text animation keyframe ───────────────────── */}
+      <style>{`
+        @keyframes shimmerText {
+          0%   { background-position: 0% center; }
+          100% { background-position: 200% center; }
+        }
+      `}</style>
     </div>
   );
 }
