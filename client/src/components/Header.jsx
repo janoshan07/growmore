@@ -68,21 +68,37 @@ export default function Header() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center h-20">
           
-          {/* Logo (Citadel Style) */}
-          <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-4 group mr-auto">
-            <div className="flex flex-col items-center justify-center gap-0.5 w-10">
-              {/* Geometric blocks imitating Citadel logo */}
-              <div className="flex gap-1">
-                <div className="w-2.5 h-2.5 bg-primary-900"></div>
-                <div className="w-2.5 h-2.5 bg-primary-900"></div>
-                <div className="w-2.5 h-2.5 bg-primary-900"></div>
-              </div>
-              <div className="w-full h-1.5 bg-primary-900 mt-0.5"></div>
-              <div className="w-full h-1.5 bg-primary-900 mt-0.5"></div>
+          {/* Logo — Grow More Lanka */}
+          <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-3 group mr-auto select-none">
+            {/* Circular emblem */}
+            <div className="relative w-11 h-11 flex-shrink-0">
+              <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-md group-hover:drop-shadow-lg transition-all duration-300">
+                {/* Outer circle */}
+                <circle cx="22" cy="22" r="21" fill="#0f1c3f" stroke="#c9a84c" strokeWidth="1.5"/>
+                {/* G letter */}
+                <text x="9" y="28" fontFamily="Georgia, serif" fontWeight="700" fontSize="18" fill="#c9a84c" letterSpacing="-0.5">G</text>
+                {/* Bar chart bars */}
+                <rect x="26" y="23" width="3.5" height="7" rx="0.8" fill="#c9a84c"/>
+                <rect x="30.5" y="19" width="3.5" height="11" rx="0.8" fill="#c9a84c"/>
+                <rect x="35" y="15" width="3.5" height="15" rx="0.8" fill="#c9a84c"/>
+              </svg>
             </div>
-            <span className="text-[26px] tracking-wide text-primary-900" style={{ fontFamily: 'Times New Roman, serif' }}>
-              GROW MORE
-            </span>
+
+            {/* Brand text */}
+            <div className="flex flex-col leading-none">
+              <span
+                className="text-[18px] font-black text-[#0f1c3f] tracking-widest uppercase group-hover:text-primary-700 transition-colors duration-200"
+                style={{ fontFamily: 'Inter, sans-serif', letterSpacing: '0.12em' }}
+              >
+                GROW MORE
+              </span>
+              <span
+                className="text-[11px] font-bold tracking-[0.3em] text-[#c9a84c] uppercase mt-0.5"
+                style={{ letterSpacing: '0.32em' }}
+              >
+                LANKA
+              </span>
+            </div>
           </Link>
 
           {/* Center Navigation Links */}
