@@ -4,7 +4,7 @@ import axios from 'axios';
  * Axios instance pre-configured with base URL and JWT auth interceptor
  */
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://growmore-08vn.onrender.com/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
