@@ -58,16 +58,16 @@ export default function Header() {
               <div className="relative w-10 h-10">
                 <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"
                   className="w-full h-full drop-shadow-lg group-hover:scale-105 transition-transform duration-300">
-                  <circle cx="22" cy="22" r="21" fill="#0f1c3f" stroke="#c9a84c" strokeWidth="1.5"/>
-                  <text x="9" y="28" fontFamily="Georgia,serif" fontWeight="700" fontSize="18" fill="#c9a84c">G</text>
-                  <rect x="26" y="23" width="3.5" height="7"  rx="0.8" fill="#c9a84c"/>
-                  <rect x="30.5" y="19" width="3.5" height="11" rx="0.8" fill="#c9a84c"/>
-                  <rect x="35"   y="15" width="3.5" height="15" rx="0.8" fill="#c9a84c"/>
+                  <circle cx="22" cy="22" r="21" fill="#0f1c3f" stroke="#00b4ff" strokeWidth="1.5"/>
+                  <text x="9" y="28" fontFamily="Georgia,serif" fontWeight="700" fontSize="18" fill="#00b4ff">G</text>
+                  <rect x="26" y="23" width="3.5" height="7"  rx="0.8" fill="#00b4ff"/>
+                  <rect x="30.5" y="19" width="3.5" height="11" rx="0.8" fill="#00b4ff"/>
+                  <rect x="35"   y="15" width="3.5" height="15" rx="0.8" fill="#00b4ff"/>
                 </svg>
               </div>
               <div className="flex flex-col leading-none">
                 <span className="text-[15px] font-black text-white tracking-widest uppercase" style={{ letterSpacing: '0.12em' }}>GROW MORE</span>
-                <span className="text-[9px] font-bold text-[#c9a84c] uppercase" style={{ letterSpacing: '0.35em' }}>LANKA</span>
+                <span className="text-[9px] font-bold text-[#00b4ff] uppercase" style={{ letterSpacing: '0.35em' }}>LANKA</span>
               </div>
             </Link>
 
@@ -81,7 +81,7 @@ export default function Header() {
                     to={to}
                     className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap group
                       ${isActive
-                        ? 'text-[#c9a84c]'
+                        ? 'text-[#00b4ff]'
                         : 'text-white/65 hover:text-white'
                       }`}
                   >
@@ -111,8 +111,8 @@ export default function Header() {
                     Client Login
                   </Link>
                   <Link to="/register"
-                    className="px-5 py-2 rounded-xl text-sm font-bold text-[#07071a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#c9a84c]/30"
-                    style={{ background: 'linear-gradient(135deg, #c9a84c, #e8c96b)' }}>
+                    className="px-5 py-2 rounded-xl text-sm font-bold text-[#07071a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#00b4ff]/30"
+                    style={{ background: 'linear-gradient(135deg, #00b4ff, #4dcfff)' }}>
                     Get Started
                   </Link>
                 </>
@@ -123,7 +123,7 @@ export default function Header() {
                     className="flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-medium text-white border border-white/10 bg-white/05 hover:bg-white/10 hover:border-white/20 transition-all"
                   >
                     <div className="w-6 h-6 rounded-full bg-[#c9a84c]/20 border border-[#c9a84c]/40 flex items-center justify-center">
-                      <FiUser className="w-3 h-3 text-[#c9a84c]" />
+                      <FiUser className="w-3 h-3 text-[#00b4ff]" />
                     </div>
                     <span>{user.name}</span>
                     <FiChevronDown className={`w-3.5 h-3.5 text-white/50 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
@@ -143,7 +143,7 @@ export default function Header() {
                         >
                           <div className="px-4 py-3.5 border-b border-white/08">
                             <p className="text-xs text-white/40 uppercase tracking-wider mb-0.5">Balance</p>
-                            <p className="font-bold text-[#c9a84c]">
+                            <p className="font-bold text-[#00b4ff]">
                               ${user.balance?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                             </p>
                           </div>
@@ -191,7 +191,7 @@ export default function Header() {
                   return (
                     <Link key={to} to={to}
                       className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                        isActive ? 'text-[#c9a84c] bg-[#c9a84c]/10' : 'text-white/70 hover:text-white hover:bg-white/05'
+                        isActive ? 'text-[#00b4ff] bg-[#c9a84c]/10' : 'text-white/70 hover:text-white hover:bg-white/05'
                       }`}>
                       {label}
                     </Link>

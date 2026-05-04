@@ -2,6 +2,11 @@ import { motion } from 'framer-motion';
 import { FiArrowRight, FiCheck } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.12, duration: 0.7, ease: [0.22,1,0.36,1] } }),
+};
+
 const plans = [
   {
     badge: 'Most Popular',
@@ -10,13 +15,15 @@ const plans = [
     return: '50%',
     period: 'yearly return',
     min: 'LKR 300,000',
-    color: '#c9a84c',
+    accentColor: '#00b4ff',
+    glowColor: 'rgba(0,180,255,0.18)',
+    borderColor: 'rgba(0,180,255,0.35)',
     features: [
       'Capital locked for 1 year',
       '50% yearly return guaranteed',
       'Capital + profit paid at year end',
       'Minimum investment: LKR 300,000',
-      'Official agreement provided',
+      'Official signed agreement provided',
     ],
   },
   {
@@ -26,13 +33,15 @@ const plans = [
     return: '30–36%',
     period: 'yearly return',
     min: 'LKR 300,000',
-    color: '#1a4b8b',
+    accentColor: '#9b6fff',
+    glowColor: 'rgba(130,60,255,0.18)',
+    borderColor: 'rgba(130,60,255,0.35)',
     features: [
       'Capital locked for 1 year',
       '30%–36% yearly return',
       'Monthly payout of 2.5%–3%',
       'Minimum investment: LKR 300,000',
-      'Official agreement provided',
+      'Official signed agreement provided',
     ],
   },
   {
@@ -41,76 +50,96 @@ const plans = [
     tagline: 'Build lasting generational wealth.',
     return: '40%',
     period: 'bonus on total investment',
-    min: 'Start from LKR 1,000/mo',
-    color: '#0f1c3f',
+    min: 'From LKR 1,000/mo',
+    accentColor: '#60c0ff',
+    glowColor: 'rgba(60,150,255,0.15)',
+    borderColor: 'rgba(60,150,255,0.30)',
     features: [
       'Long-term savings plan (10 years)',
       'Monthly increasing contribution',
       '40% bonus on total investment',
       'Paid in full at end of 10 years',
-      'Official agreement provided',
+      'Official signed agreement provided',
     ],
   },
 ];
 
-const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: (i) => ({ opacity: 1, y: 0, transition: { delay: i * 0.15, duration: 0.6 } }) };
-
 export default function Plans() {
   return (
-    <div className="w-full bg-gray-50 overflow-hidden">
+    <div className="w-full overflow-hidden" style={{ background: '#04020e' }}>
 
-      {/* Hero */}
-      <section className="relative bg-[#0f1c3f] text-white py-24 px-6 text-center overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_#c9a84c_0%,_transparent_70%)]" />
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="relative z-10 max-w-3xl mx-auto">
-          <span className="inline-block bg-[#c9a84c]/20 border border-[#c9a84c]/40 text-[#c9a84c] text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-6">Investment Plans</span>
-          <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight">
+      {/* ── Hero ───────────────────────────────────────────── */}
+      <section className="relative py-32 px-6 text-center overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 30%,rgba(110,30,220,0.22),transparent 70%)' }} />
+        <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
+          style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.5) 1px,transparent 1px)', backgroundSize: '60px 60px' }} />
+
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} className="relative z-10 max-w-3xl mx-auto">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase mb-6"
+            style={{ background: 'rgba(130,60,255,0.12)', border: '1px solid rgba(130,60,255,0.35)', color: '#c4a0ff' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+            Investment Plans
+          </span>
+          <h1 className="font-black leading-tight mb-6 text-white" style={{ fontSize: 'clamp(2.5rem,6vw,5rem)' }}>
             Plans Designed to<br />
-            <span className="text-[#c9a84c]">Grow Your Wealth</span>
+            <span style={{
+              background: 'linear-gradient(135deg,#00b4ff,#4dcfff,#a060ff)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            }}>Grow Your Wealth</span>
           </h1>
-          <p className="text-white/70 text-lg max-w-2xl mx-auto">
+          <p className="text-lg leading-relaxed max-w-2xl mx-auto" style={{ color: 'rgba(255,255,255,0.52)' }}>
             Choose from our structured investment plans — each designed to deliver real, measurable returns with full transparency and security.
           </p>
         </motion.div>
       </section>
 
-      {/* Plan Cards */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
-        <div className="grid md:grid-cols-3 gap-8">
+      {/* ── Plan Cards ─────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-6 py-10 pb-24">
+        <div className="grid md:grid-cols-3 gap-7">
           {plans.map((plan, i) => (
             <motion.div key={plan.name} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
-              className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-400 flex flex-col">
-              {/* Top accent bar */}
-              <div className="h-1.5 w-full" style={{ backgroundColor: plan.color }} />
+              className="relative rounded-2xl overflow-hidden flex flex-col transition-all duration-400 hover:-translate-y-2"
+              style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${plan.borderColor}`, boxShadow: `0 0 60px ${plan.glowColor}` }}>
+              {/* top glow bar */}
+              <div className="h-1 w-full" style={{ background: `linear-gradient(90deg,transparent,${plan.accentColor},transparent)` }} />
+              {/* top accent line */}
+              <div className="absolute top-0 left-0 right-0 h-px"
+                style={{ background: `linear-gradient(90deg,transparent,${plan.accentColor},transparent)` }} />
+
               <div className="p-8 flex flex-col flex-1">
-                <span className="inline-block text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-5"
-                  style={{ backgroundColor: plan.color + '18', color: plan.color }}>
+                {/* Badge */}
+                <span className="inline-block text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-5 w-fit"
+                  style={{ background: `${plan.accentColor}18`, color: plan.accentColor, border: `1px solid ${plan.accentColor}40` }}>
                   {plan.badge}
                 </span>
-                <h2 className="text-2xl font-black text-[#0f1c3f] mb-2">{plan.name}</h2>
-                <p className="text-gray-500 text-sm mb-6">{plan.tagline}</p>
 
-                {/* Return highlight */}
-                <div className="rounded-xl p-5 mb-6" style={{ backgroundColor: plan.color + '12' }}>
-                  <p className="text-5xl font-black" style={{ color: plan.color }}>{plan.return}</p>
-                  <p className="text-gray-500 text-sm mt-1">{plan.period}</p>
-                  <p className="text-xs text-gray-400 mt-2">Minimum: <span className="font-semibold text-gray-600">{plan.min}</span></p>
+                <h2 className="text-2xl font-black text-white mb-1">{plan.name}</h2>
+                <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.40)' }}>{plan.tagline}</p>
+
+                {/* Return */}
+                <div className="rounded-xl p-5 mb-6" style={{ background: `${plan.accentColor}10`, border: `1px solid ${plan.accentColor}25` }}>
+                  <p className="font-black leading-none" style={{ fontSize: '3.5rem', color: plan.accentColor }}>{plan.return}</p>
+                  <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>{plan.period}</p>
+                  <p className="text-xs mt-2" style={{ color: 'rgba(255,255,255,0.30)' }}>
+                    Minimum: <span className="font-semibold text-white/60">{plan.min}</span>
+                  </p>
                 </div>
 
                 {/* Features */}
                 <ul className="flex flex-col gap-3 mb-8 flex-1">
                   {plan.features.map(f => (
-                    <li key={f} className="flex items-start gap-3 text-sm text-gray-600">
-                      <FiCheck className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: plan.color }} />
+                    <li key={f} className="flex items-start gap-3 text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                      <FiCheck className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: plan.accentColor }} />
                       {f}
                     </li>
                   ))}
                 </ul>
 
                 <Link to="/contact"
-                  className="btn-primary flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold"
-                  style={{ backgroundColor: plan.color, border: 'none' }}>
-                  Get Started <FiArrowRight className="btn-icon" />
+                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5"
+                  style={{ background: `linear-gradient(135deg, ${plan.accentColor}, ${plan.accentColor}cc)`, color: '#04020e', boxShadow: `0 0 30px ${plan.glowColor}` }}>
+                  Get Started <FiArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             </motion.div>
@@ -118,11 +147,12 @@ export default function Plans() {
         </div>
       </section>
 
-      {/* Disclaimer */}
-      <section className="max-w-4xl mx-auto px-6 pb-20 text-center">
-        <p className="text-gray-400 text-sm">
-          All plans require a signed official investment agreement. Returns are based on agreed terms. 
-          Please <Link to="/contact" className="text-[#c9a84c] hover:underline">contact us</Link> for full details before investing.
+      {/* ── Disclaimer ─────────────────────────────────────── */}
+      <section className="pb-20 px-6 text-center">
+        <p className="text-sm max-w-2xl mx-auto" style={{ color: 'rgba(255,255,255,0.28)' }}>
+          All plans require a signed official investment agreement. Returns are based on agreed terms.{' '}
+          <Link to="/contact" className="hover:underline transition-colors" style={{ color: '#00b4ff' }}>Contact us</Link>{' '}
+          for full details before investing.
         </p>
       </section>
 
