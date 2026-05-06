@@ -2,15 +2,31 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import GoogleSignInButton from '../components/GoogleSignInButton';
 import toast from 'react-hot-toast';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, googleSignIn } = useAuth();
   const navigate   = useNavigate();
   const [form,     setForm]     = useState({ email: '', password: '' });
   const [showPwd,  setShowPwd]  = useState(false);
   const [loading,  setLoading]  = useState(false);
+
+  const handleGoogle = async (credential) => {
+    setLoading(true);
+    try {
+      const result = await googleSignIn(credential);
+      if (result.status === 'logged_in') {
+        toast.success('Welcome back!');
+        navigate('/dashboard');
+      } else {
+        toast('No account found. Please sign up first.', { icon: 'ℹ️' });
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Google sign-in failed');
+    } finally { setLoading(false); }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -108,6 +124,16 @@ export default function Login() {
             <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.55)' }}>
               Password: <span className="font-mono text-white/80">Demo@1234</span>
             </p>
+          </div>
+
+          {/* Google Sign-In */}
+          <div className="mb-5">
+            <GoogleSignInButton onCredential={handleGoogle} />
+          </div>
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex-1 h-px" style={{background:'rgba(255,255,255,0.08)'}}/>
+            <span className="text-xs font-semibold" style={{color:'rgba(255,255,255,0.3)'}}>OR</span>
+            <div className="flex-1 h-px" style={{background:'rgba(255,255,255,0.08)'}}/>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">

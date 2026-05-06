@@ -26,8 +26,33 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const register = async (name, email, password) => {
-    const { data } = await api.post('/auth/register', { name, email, password });
+  /* Step 1 — send OTP to email */
+  const sendOtp = async (name, email, password) => {
+    const { data } = await api.post('/auth/send-otp', { name, email, password });
+    return data;
+  };
+
+  /* Step 2 — verify OTP, create account, auto-login */
+  const completeRegistration = async (email, otp) => {
+    const { data } = await api.post('/auth/verify-otp', { email, otp });
+    localStorage.setItem('gm_token', data.token);
+    setUser(data.user);
+    return data;
+  };
+
+  /* Google OAuth Step 1 — verify Google credential, get OTP or login */
+  const googleSignIn = async (credential) => {
+    const { data } = await api.post('/auth/google', { credential });
+    if (data.status === 'logged_in') {
+      localStorage.setItem('gm_token', data.token);
+      setUser(data.user);
+    }
+    return data; // caller checks data.status
+  };
+
+  /* Google OAuth Step 2 — verify OTP sent to Gmail, create account */
+  const googleCompleteRegistration = async (email, otp) => {
+    const { data } = await api.post('/auth/google/verify-otp', { email, otp });
     localStorage.setItem('gm_token', data.token);
     setUser(data.user);
     return data;
@@ -49,7 +74,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, register, logout, refreshUser, loading }}>
+    <AuthContext.Provider value={{ user, setUser, login, sendOtp, completeRegistration, googleSignIn, googleCompleteRegistration, logout, refreshUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -39,6 +39,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    googleId: {
+      type: String,
+      default: null,
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -49,13 +53,14 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Hash password before saving
+// Hash password before saving (skip if already hashed by OTP flow)
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password') || this.$skipPasswordHash) return next();
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
 
 // Compare entered password with hashed password
 userSchema.methods.matchPassword = async function (enteredPassword) {
