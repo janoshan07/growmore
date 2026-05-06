@@ -217,7 +217,9 @@ export default function Register() {
   const submitName = e => { e.preventDefault(); if (data.name.trim()) go(1); };
   const submitEmail = e => {
     e.preventDefault();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) return toast.error('Enter a valid email');
+    const cleanEmail = data.email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) return toast.error('Enter a valid email');
+    setData({ ...data, email: cleanEmail });
     go(1);
   };
   const submitPassword = async e => {
