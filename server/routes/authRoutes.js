@@ -3,7 +3,7 @@ const router  = express.Router();
 const {
   sendOtp, verifyOtpAndRegister,
   googleAuth, googleVerifyOtp,
-  login, getMe, updateProfile,
+  login, verifyLoginOtp, getMe, updateProfile,
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -17,6 +17,7 @@ router.post('/google/verify-otp', googleVerifyOtp);
 
 // Standard auth
 router.post('/login',             login);
+router.post('/login/verify-otp',  verifyLoginOtp);
 router.get('/me',                 protect, getMe);
 router.put('/profile',            protect, updateProfile);
 

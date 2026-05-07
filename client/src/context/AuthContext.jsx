@@ -21,6 +21,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
+    return data; // returns status: 'otp_required'
+  };
+
+  const verifyLoginOtp = async (email, otp) => {
+    const { data } = await api.post('/auth/login/verify-otp', { email, otp });
     localStorage.setItem('gm_token', data.token);
     setUser(data.user);
     return data;
@@ -74,7 +79,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, sendOtp, completeRegistration, googleSignIn, googleCompleteRegistration, logout, refreshUser, loading }}>
+    <AuthContext.Provider value={{ user, setUser, login, verifyLoginOtp, sendOtp, completeRegistration, googleSignIn, googleCompleteRegistration, logout, refreshUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

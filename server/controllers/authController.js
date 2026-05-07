@@ -189,6 +189,43 @@ const login = async (req, res, next) => {
     if (!isMatch)
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
 
+    // Generate and send OTP for 2FA
+    const otp = makeOtp();
+    await Otp.deleteMany({ email });
+    await Otp.create({ email, otp, name: user.name, isGoogleUser: false });
+    await sendOtpEmail(email, otp, user.name);
+
+    res.status(200).json({
+      success: true,
+      status: 'otp_required',
+      message: 'Verification code sent to your email. Please verify to log in.',
+      email: user.email,
+    });
+  } catch (error) { next(error); }
+};
+
+/* ══════════════════════════════════════════════════════════════════════════
+   VERIFY LOGIN OTP
+   POST /api/auth/login/verify-otp
+   ══════════════════════════════════════════════════════════════════════════ */
+const verifyLoginOtp = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp)
+      return res.status(400).json({ success: false, message: 'Email and OTP are required' });
+
+    const record = await Otp.findOne({ email });
+    if (!record)
+      return res.status(400).json({ success: false, message: 'OTP expired or not found. Please log in again.' });
+    if (record.otp !== String(otp).trim())
+      return res.status(400).json({ success: false, message: 'Invalid OTP. Please try again.' });
+
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(404).json({ success: false, message: 'User not found' });
+
+    await Otp.deleteMany({ email });
+
     const token = generateToken(user._id);
     res.status(200).json({
       success: true, message: 'Login successful', token,
@@ -215,4 +252,4 @@ const updateProfile = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
-module.exports = { sendOtp, verifyOtpAndRegister, googleAuth, googleVerifyOtp, login, getMe, updateProfile };
+module.exports = { sendOtp, verifyOtpAndRegister, googleAuth, googleVerifyOtp, login, verifyLoginOtp, getMe, updateProfile };

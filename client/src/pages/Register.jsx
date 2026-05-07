@@ -426,7 +426,7 @@ export default function Register() {
 
         <p className="text-center text-sm mt-5" style={{color:'rgba(255,255,255,0.35)'}}>
           Already have an account?{' '}
-          <Link to="/login" className="font-semibold hover:underline" style={{color:'#00b4ff'}}>Sign in</Link>
+          <Link to="/login" className="font-semibold hover:underline" style={{color:'#00b4ff'}}>Login</Link>
         </p>
         <p className="text-center mt-3 text-xs" style={{color:'rgba(255,255,255,0.2)'}}>
           <Link to="/" className="hover:opacity-60 transition-opacity">← Back to Home</Link>
