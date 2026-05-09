@@ -110,10 +110,10 @@ export default function Login() {
 
   const go = d => { setDir(d); setStep(s => s + d); };
 
-  const handleGoogle = async (credential) => {
+  const handleGoogle = async (accessToken) => {
     setLoading(true);
     try {
-      const result = await googleSignIn(credential);
+      const result = await googleSignIn(accessToken);
       if (result.status === 'logged_in') {
         toast.success('Welcome back!');
         navigate('/dashboard');
@@ -121,7 +121,7 @@ export default function Login() {
         toast('No account found. Please sign up first.', { icon: 'ℹ️' });
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Google sign-in failed');
+      toast.error(err.friendlyMessage || err.response?.data?.message || 'Google sign-in failed');
     } finally { setLoading(false); }
   };
 

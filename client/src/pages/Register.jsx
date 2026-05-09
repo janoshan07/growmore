@@ -254,10 +254,10 @@ export default function Register() {
   };
 
   /* ── Google OAuth flow ────────────────── */
-  const handleGoogleCredential = async (credential) => {
+  const handleGoogleCredential = async (accessToken) => {
     setLoading(true);
     try {
-      const result = await googleSignIn(credential);
+      const result = await googleSignIn(accessToken);
       if (result.status === 'logged_in') {
         toast.success('Welcome back!');
         navigate('/dashboard');
@@ -267,10 +267,10 @@ export default function Register() {
         setGName(result.name);
         setIsGoogleFlow(true);
         setDir(1);
-        setStep(4); // Google OTP step (separate from email/pass OTP = step 3)
+        setStep(4);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Google sign-in failed');
+      toast.error(err.friendlyMessage || err.response?.data?.message || 'Google sign-in failed');
     } finally { setLoading(false); }
   };
 

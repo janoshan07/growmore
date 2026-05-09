@@ -18,15 +18,26 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle 401 globally - redirect to login
+// Handle errors globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+
+    // 401 — token expired / invalid → force logout
+    if (status === 401) {
       localStorage.removeItem('gm_token');
       localStorage.removeItem('gm_user');
       window.location.href = '/login';
     }
+
+    // 502 / 503 / 504 — Render free tier is waking up
+    if (status === 502 || status === 503 || status === 504 || !error.response) {
+      // Attach a friendly message so the catch block in each page can use it
+      error.friendlyMessage =
+        '⏳ Server is waking up (free tier). Please wait ~30 seconds and try again.';
+    }
+
     return Promise.reject(error);
   }
 );
