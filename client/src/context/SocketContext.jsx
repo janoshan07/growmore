@@ -8,7 +8,13 @@ export const SocketProvider = ({ children }) => {
   const [prices, setPrices] = useState({});
 
   useEffect(() => {
-    const s = io('/', { transports: ['websocket'] });
+    // In production, WebSockets must go to the Render backend (Vercel is serverless)
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || '/';
+    const s = io(socketUrl, {
+      transports: ['websocket', 'polling'], // polling fallback prevents hard failures
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
+    });
     setSocket(s);
 
     s.on('market:prices', (data) => {

@@ -20,9 +20,13 @@ export default function GoogleSignInButton({ onCredential, label = 'Continue wit
     window.google.accounts.id.initialize({
       client_id: clientId,
       callback: handleResponse,
-      auto_select: false,
+      auto_select: false,        // don't auto-pick last account
       cancel_on_tap_outside: true,
+      itp_support: true,         // Safari/iOS compatibility
     });
+
+    // Explicitly cancel One Tap so it doesn't block account switching
+    window.google.accounts.id.cancel();
 
     // Render the styled Google button inside our container
     window.google.accounts.id.renderButton(containerRef.current, {
