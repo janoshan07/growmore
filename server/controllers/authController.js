@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const https  = require('https');
 const bcrypt = require('bcryptjs');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
@@ -6,6 +7,16 @@ const Portfolio = require('../models/Portfolio');
 const Otp = require('../models/Otp');
 const generateToken = require('../utils/generateToken');
 const { sendOtpEmail } = require('../utils/emailService');
+
+// Works on ALL Node versions (no native fetch required)
+const httpsGet = (url, headers = {}) => new Promise((resolve, reject) => {
+  const opts = { headers };
+  https.get(url, opts, (res) => {
+    let body = '';
+    res.on('data', (chunk) => { body += chunk; });
+    res.on('end', () => { try { resolve(JSON.parse(body)); } catch { resolve(body); } });
+  }).on('error', reject);
+});
 
 const makeOtp = () => String(Math.floor(100000 + Math.random() * 900000));
 
@@ -88,10 +99,9 @@ const googleAuth = async (req, res, next) => {
 
     if (accessToken) {
       /* ── New flow: verify access token via Google's tokeninfo endpoint ── */
-      const tokenInfoRes = await fetch(
+      const tokenInfo = await httpsGet(
         `https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(accessToken)}`
       );
-      const tokenInfo = await tokenInfoRes.json();
 
       if (tokenInfo.error) {
         return res.status(401).json({ success: false, message: 'Google access token is invalid or expired' });
@@ -102,10 +112,10 @@ const googleAuth = async (req, res, next) => {
       }
 
       // Fetch full user profile (name, picture)
-      const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      const userInfo = await userInfoRes.json();
+      const userInfo = await httpsGet(
+        'https://www.googleapis.com/oauth2/v3/userinfo',
+        { Authorization: `Bearer ${accessToken}` }
+      );
 
       googleId = userInfo.sub;
       email    = userInfo.email;
