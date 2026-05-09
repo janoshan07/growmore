@@ -233,7 +233,7 @@ export default function Register() {
       setIsGoogleFlow(false);
       go(1);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to send OTP');
+      toast.error(err.friendlyMessage || err.response?.data?.message || 'Failed to send OTP. Please try again.');
     } finally { setLoading(false); }
   };
 
@@ -244,7 +244,7 @@ export default function Register() {
       toast.success('Account created! Welcome 🎉');
       navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Invalid code');
+      toast.error(err.friendlyMessage || err.response?.data?.message || 'Invalid code. Please try again.');
     } finally { setLoading(false); }
   };
 
