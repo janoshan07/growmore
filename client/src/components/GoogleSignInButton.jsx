@@ -12,8 +12,10 @@ export default function GoogleSignInButton({ onCredential, label = 'Continue wit
     if (response?.credential) onCredential(response.credential);
   }, [onCredential]);
 
+  const isConfigured = clientId && !clientId.startsWith('your_') && clientId.includes('.apps.googleusercontent.com');
+
   useEffect(() => {
-    if (!window.google || !clientId) return;
+    if (!window.google || !isConfigured) return;
 
     window.google.accounts.id.initialize({
       client_id: clientId,
@@ -33,12 +35,8 @@ export default function GoogleSignInButton({ onCredential, label = 'Continue wit
     });
   }, [handleResponse, clientId]);
 
-  if (!clientId) {
-    return (
-      <p className="text-center text-xs py-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
-        Google Sign-In not configured (missing VITE_GOOGLE_CLIENT_ID)
-      </p>
-    );
+  if (!isConfigured) {
+    return null; // Hide silently if Google Sign-In is not configured
   }
 
   return (
