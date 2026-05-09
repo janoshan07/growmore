@@ -1,10 +1,18 @@
 import axios from 'axios';
 
+const rawApiUrl = import.meta.env.VITE_API_URL;
+// Only use VITE_API_URL if it's a real URL (starts with http or /)
+// Guards against accidentally pasting key=value strings in the Vercel dashboard
+const BASE_URL =
+  rawApiUrl && (rawApiUrl.startsWith('http') || rawApiUrl === '/api')
+    ? rawApiUrl
+    : 'https://growmore-08vn.onrender.com/api';
+
 /**
  * Axios instance pre-configured with base URL and JWT auth interceptor
  */
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://growmore-08vn.onrender.com/api',
+  baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 });
 
