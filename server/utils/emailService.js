@@ -8,14 +8,20 @@ const nodemailer = require('nodemailer');
  *   EMAIL_USER  — your Gmail address (e.g. yourapp@gmail.com)
  *   EMAIL_PASS  — Gmail App Password (16-char, generated in Google Account > Security > App Passwords)
  */
-const createTransporter = () =>
-  nodemailer.createTransport({
+const createTransporter = () => {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    throw new Error(
+      'Email service not configured: EMAIL_USER and EMAIL_PASS must be set in environment variables.'
+    );
+  }
+  return nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
   });
+};
 
 /**
  * Sends an OTP verification email.
