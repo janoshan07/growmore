@@ -45,9 +45,9 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  /* Google OAuth Step 1 — verify Google credential, get OTP or login */
-  const googleSignIn = async (credential) => {
-    const { data } = await api.post('/auth/google', { credential });
+  /* Google OAuth Step 1 — verify Google access token, get OTP or login */
+  const googleSignIn = async (accessToken) => {
+    const { data } = await api.post('/auth/google', { accessToken });
     if (data.status === 'logged_in') {
       localStorage.setItem('gm_token', data.token);
       setUser(data.user);

@@ -74,26 +74,58 @@ const verifyOtpAndRegister = async (req, res, next) => {
 /* ══════════════════════════════════════════════════════════════════════════
    GOOGLE OAUTH — Step 1: Verify Google token, send OTP
    POST /api/auth/google
+   Accepts:
+     { accessToken }  — new flow: OAuth2 implicit grant (always shows account picker)
+     { credential }   — old flow: GSI ID token (kept for backwards compat)
    ══════════════════════════════════════════════════════════════════════════ */
 const googleAuth = async (req, res, next) => {
   try {
-    const { credential } = req.body;
-    if (!credential)
-      return res.status(400).json({ success: false, message: 'Google credential is required' });
+    const { credential, accessToken } = req.body;
+    if (!credential && !accessToken)
+      return res.status(400).json({ success: false, message: 'Google credential or access token is required' });
 
-    // Verify the Google ID token
-    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    const { sub: googleId, email, name, picture } = payload;
+    let googleId, email, name, picture;
+
+    if (accessToken) {
+      /* ── New flow: verify access token via Google's tokeninfo endpoint ── */
+      const tokenInfoRes = await fetch(
+        `https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(accessToken)}`
+      );
+      const tokenInfo = await tokenInfoRes.json();
+
+      if (tokenInfo.error) {
+        return res.status(401).json({ success: false, message: 'Google access token is invalid or expired' });
+      }
+      // Ensure the token was issued for OUR app, not someone else's
+      if (tokenInfo.aud !== process.env.GOOGLE_CLIENT_ID) {
+        return res.status(401).json({ success: false, message: 'Google token audience mismatch' });
+      }
+
+      // Fetch full user profile (name, picture)
+      const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const userInfo = await userInfoRes.json();
+
+      googleId = userInfo.sub;
+      email    = userInfo.email;
+      name     = userInfo.name;
+      picture  = userInfo.picture;
+
+    } else {
+      /* ── Old flow: verify Google ID token (JWT credential) ── */
+      const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      ({ sub: googleId, email, name, picture } = payload);
+    }
 
     // If user already has an account → log them in directly
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      // If they registered with email/password before, link their Google account
       if (!existingUser.googleId) {
         existingUser.googleId = googleId;
         existingUser.avatar = existingUser.avatar || picture;
