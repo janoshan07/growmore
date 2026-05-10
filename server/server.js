@@ -96,6 +96,11 @@ app.get('/', (req, res) => {
   res.status(200).json({ success: true, message: 'Grow More API is running 🚀' });
 });
 
+// /api root — fallback so health probes hitting /api don't 404
+app.get('/api', (req, res) => {
+  res.status(200).json({ success: true, message: 'Grow More API is running 🚀' });
+});
+
 // API health check (used by the frontend SocketContext wake-up loop)
 app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'Grow More API is running 🚀', timestamp: new Date() });

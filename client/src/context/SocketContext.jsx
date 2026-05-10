@@ -3,8 +3,15 @@ import { io } from 'socket.io-client';
 
 const SocketContext = createContext(null);
 
-const SOCKET_URL  = import.meta.env.VITE_SOCKET_URL  || '/';
-const HEALTH_URL  = (import.meta.env.VITE_API_URL    || '/api').replace(/\/api$/, '/api/health');
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || '/';
+
+// Derive health URL from SOCKET_URL (always the clean base server URL)
+// e.g. https://growmore-08vn.onrender.com → https://growmore-08vn.onrender.com/api/health
+// Falls back to /api/health for local dev (Vite proxy handles it)
+const HEALTH_URL = SOCKET_URL && SOCKET_URL !== '/'
+  ? `${SOCKET_URL.replace(/\/$/, '')}/api/health`
+  : '/api/health';
+
 const MAX_RETRIES = 12;   // 12 × 5 s = 60 s max wait
 const RETRY_MS    = 5000;
 
