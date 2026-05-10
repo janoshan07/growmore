@@ -90,7 +90,13 @@ app.use('/api/market', marketRoutes);
 app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Health check
+// Root route — Render's platform health checker pings GET /
+// Without this it returns 404 and Render marks the service as unhealthy
+app.get('/', (req, res) => {
+  res.status(200).json({ success: true, message: 'Grow More API is running 🚀' });
+});
+
+// API health check (used by the frontend SocketContext wake-up loop)
 app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'Grow More API is running 🚀', timestamp: new Date() });
 });
