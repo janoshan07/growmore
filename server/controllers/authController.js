@@ -20,6 +20,15 @@ const httpsGet = (url, headers = {}) => new Promise((resolve, reject) => {
 
 const makeOtp = () => String(Math.floor(100000 + Math.random() * 900000));
 
+/** Sends OTP email with a 15-second timeout to prevent hanging on SMTP errors */
+const sendOtpWithTimeout = (to, otp, name) =>
+  Promise.race([
+    sendOtpEmail(to, otp, name),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('EMAIL_TIMEOUT')), 15000)
+    ),
+  ]);
+
 /* ══════════════════════════════════════════════════════════════════════════
    STEP 1 — Send OTP (email/password registration)
    POST /api/auth/send-otp
@@ -40,7 +49,19 @@ const sendOtp = async (req, res, next) => {
     const otp = makeOtp();
     await Otp.deleteMany({ email });
     await Otp.create({ email, otp, name, password: hashed });
-    await sendOtpEmail(email, otp, name);
+
+    try {
+      await sendOtpWithTimeout(email, otp, name);
+    } catch (emailErr) {
+      await Otp.deleteMany({ email }); // clean up on failure
+      const isTimeout = emailErr.message === 'EMAIL_TIMEOUT';
+      return res.status(503).json({
+        success: false,
+        message: isTimeout
+          ? 'Email service timed out. Please check Render EMAIL_USER/EMAIL_PASS env vars and try again.'
+          : `Email service error: ${emailErr.message}`,
+      });
+    }
 
     res.status(200).json({ success: true, message: 'OTP sent to your email. Expires in 10 minutes.' });
   } catch (error) { next(error); }
@@ -235,7 +256,19 @@ const login = async (req, res, next) => {
     const otp = makeOtp();
     await Otp.deleteMany({ email });
     await Otp.create({ email, otp, name: user.name, isGoogleUser: false });
-    await sendOtpEmail(email, otp, user.name);
+
+    try {
+      await sendOtpWithTimeout(email, otp, user.name);
+    } catch (emailErr) {
+      await Otp.deleteMany({ email }); // clean up on failure
+      const isTimeout = emailErr.message === 'EMAIL_TIMEOUT';
+      return res.status(503).json({
+        success: false,
+        message: isTimeout
+          ? 'Email service timed out. Please check Render EMAIL_USER/EMAIL_PASS env vars and try again.'
+          : `Email service error: ${emailErr.message}`,
+      });
+    }
 
     res.status(200).json({
       success: true,
