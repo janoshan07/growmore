@@ -113,18 +113,7 @@
   }
 }
 
-/* Ticker animation */
-.ticker-wrap {
-  overflow: hidden;
-  white-space: nowrap;
-}
-.ticker-content {
-  display: inline-block;
-  animation: ticker 40s linear infinite;
-}
-.ticker-content:hover {
-  animation-play-state: paused;
-}
+/* Ticker animation removed — now handled by requestAnimationFrame in MarketTicker.jsx */
 
 /* Number flash on update */
 @keyframes flashGreen {
