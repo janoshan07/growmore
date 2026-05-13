@@ -4,12 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import {
   FiBarChart2, FiPieChart, FiTrendingUp, FiLogOut,
-  FiMenu, FiX, FiShield, FiUser,
+  FiMenu, FiX, FiShield, FiUser, FiDollarSign,
 } from 'react-icons/fi';
 
 const navLinks = [
   { to: '/dashboard', label: 'Dashboard', icon: FiBarChart2 },
-  { to: '/market', label: 'Market', icon: FiTrendingUp },
+  { to: '/market',    label: 'Market',    icon: FiTrendingUp },
   { to: '/portfolio', label: 'Portfolio', icon: FiPieChart },
 ];
 
@@ -19,115 +19,196 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  const handleLogout = () => { logout(); navigate('/'); };
 
   return (
-    <nav className="sticky top-0 z-50 bg-dark-100/80 backdrop-blur-md border-b border-gray-700/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-              <FiTrendingUp className="text-white w-5 h-5" />
+    <nav style={{
+      position: 'sticky', top: 0, zIndex: 50,
+      background: 'rgba(4,15,28,0.92)',
+      backdropFilter: 'blur(16px)',
+      borderBottom: '1px solid rgba(0,229,255,0.1)',
+      boxShadow: '0 1px 20px rgba(0,0,0,0.4)',
+    }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 62 }}>
+
+          {/* ── Logo ── */}
+          <Link to="/dashboard" style={{
+            display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none',
+          }}>
+            <svg viewBox="0 0 44 44" fill="none" width="32" height="32">
+              <circle cx="22" cy="22" r="21" fill="#0f1c3f" stroke="#00b4ff" strokeWidth="1.5"/>
+              <text x="9" y="28" fontFamily="Georgia,serif" fontWeight="700" fontSize="18" fill="#00b4ff">G</text>
+              <rect x="26" y="23" width="3.5" height="7"  rx="0.8" fill="#00b4ff"/>
+              <rect x="30.5" y="19" width="3.5" height="11" rx="0.8" fill="#00b4ff"/>
+              <rect x="35"   y="15" width="3.5" height="15" rx="0.8" fill="#00b4ff"/>
+            </svg>
+            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+              <span style={{ fontSize: 13, fontWeight: 900, color: '#e0f7fa', letterSpacing: '0.1em' }}>GROW MORE</span>
+              <span style={{ fontSize: 8, fontWeight: 700, color: '#00b4ff', letterSpacing: '0.3em' }}>LANKA</span>
             </div>
-            <span className="font-bold text-lg text-white">
-              Grow<span className="text-primary-400">More</span>
-            </span>
           </Link>
 
-          {/* Desktop Links */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map(({ to, label, icon: Icon }) => (
-              <Link
-                key={to}
-                to={to}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                  ${location.pathname === to
-                    ? 'bg-primary-500/20 text-primary-400'
-                    : 'text-gray-400 hover:text-white hover:bg-dark-200'
-                  }`}
-              >
-                <Icon className="w-4 h-4" />
-                {label}
-              </Link>
-            ))}
+          {/* ── Desktop nav links ── */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }} className="hidden-mobile">
+            {navLinks.map(({ to, label, icon: Icon }) => {
+              const active = location.pathname === to;
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 7,
+                    padding: '7px 14px', borderRadius: 10, textDecoration: 'none',
+                    fontSize: 13, fontWeight: 600, transition: 'all 0.2s',
+                    background: active ? 'rgba(0,229,255,0.12)' : 'transparent',
+                    border: `1px solid ${active ? 'rgba(0,229,255,0.3)' : 'transparent'}`,
+                    color: active ? '#00e5ff' : '#7ecfda',
+                  }}
+                  onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = 'rgba(0,229,255,0.06)'; e.currentTarget.style.color = '#e0f7fa'; }}}
+                  onMouseLeave={(e) => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#7ecfda'; }}}
+                >
+                  <Icon style={{ width: 15, height: 15 }} />
+                  {label}
+                </Link>
+              );
+            })}
             {user?.role === 'admin' && (
               <Link
                 to="/admin"
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                  ${location.pathname === '/admin'
-                    ? 'bg-purple-500/20 text-purple-400'
-                    : 'text-gray-400 hover:text-white hover:bg-dark-200'
-                  }`}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 7,
+                  padding: '7px 14px', borderRadius: 10, textDecoration: 'none',
+                  fontSize: 13, fontWeight: 600, transition: 'all 0.2s',
+                  background: location.pathname === '/admin' ? 'rgba(139,92,246,0.15)' : 'transparent',
+                  border: `1px solid ${location.pathname === '/admin' ? 'rgba(139,92,246,0.35)' : 'transparent'}`,
+                  color: location.pathname === '/admin' ? '#a78bfa' : '#7ecfda',
+                }}
               >
-                <FiShield className="w-4 h-4" />
+                <FiShield style={{ width: 15, height: 15 }} />
                 Admin
               </Link>
             )}
           </div>
 
-          {/* User Info + Logout */}
-          <div className="hidden md:flex items-center gap-3">
-            <div className="text-right">
-              <p className="text-sm font-semibold text-white">{user?.name}</p>
-              <p className="text-xs text-primary-400 font-mono">
-                ${user?.balance?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-              </p>
+          {/* ── User info + logout (desktop) ── */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }} className="hidden-mobile">
+            {/* Balance */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 7,
+              padding: '6px 12px', borderRadius: 10,
+              background: 'rgba(0,229,255,0.06)',
+              border: '1px solid rgba(0,229,255,0.15)',
+            }}>
+              <FiDollarSign style={{ color: '#00e5ff', width: 13, height: 13 }} />
+              <span style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 700, color: '#00e5ff' }}>
+                {user?.balance?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </span>
             </div>
-            <div className="w-8 h-8 bg-primary-500/20 rounded-full flex items-center justify-center">
-              <FiUser className="text-primary-400 w-4 h-4" />
+
+            {/* Avatar + name */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'rgba(0,229,255,0.12)',
+                border: '1px solid rgba(0,229,255,0.25)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <FiUser style={{ color: '#00e5ff', width: 14, height: 14 }} />
+              </div>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#e0f7fa' }}>{user?.name}</span>
             </div>
+
+            {/* Logout */}
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-red-500/10"
               title="Logout"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 34, height: 34, borderRadius: 10, cursor: 'pointer',
+                background: 'transparent', border: '1px solid rgba(248,113,113,0.2)',
+                color: '#f87171', transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(248,113,113,0.1)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
             >
-              <FiLogOut className="w-4 h-4" />
+              <FiLogOut style={{ width: 14, height: 14 }} />
             </button>
           </div>
 
-          {/* Mobile menu button */}
+          {/* ── Mobile hamburger ── */}
           <button
-            className="md:hidden text-gray-400 hover:text-white p-2"
+            className="show-mobile"
             onClick={() => setMobileOpen(!mobileOpen)}
+            style={{
+              background: 'transparent', border: '1px solid rgba(0,229,255,0.2)',
+              borderRadius: 8, padding: 7, cursor: 'pointer',
+              color: '#7ecfda', display: 'none',
+            }}
           >
-            {mobileOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
+            {mobileOpen ? <FiX style={{ width: 18, height: 18 }} /> : <FiMenu style={{ width: 18, height: 18 }} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* ── Mobile menu ── */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-dark-100 border-t border-gray-700/50 px-4 py-3 space-y-1"
+            style={{
+              overflow: 'hidden',
+              borderTop: '1px solid rgba(0,229,255,0.1)',
+              background: 'rgba(4,15,28,0.98)',
+            }}
           >
-            {navLinks.map(({ to, label, icon: Icon }) => (
-              <Link
-                key={to}
-                to={to}
-                onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors
-                  ${location.pathname === to ? 'bg-primary-500/20 text-primary-400' : 'text-gray-400'}`}
+            <div style={{ padding: '12px 20px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {navLinks.map(({ to, label, icon: Icon }) => {
+                const active = location.pathname === to;
+                return (
+                  <Link
+                    key={to}
+                    to={to}
+                    onClick={() => setMobileOpen(false)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '10px 14px', borderRadius: 10, textDecoration: 'none',
+                      fontSize: 13, fontWeight: 600,
+                      background: active ? 'rgba(0,229,255,0.1)' : 'transparent',
+                      color: active ? '#00e5ff' : '#7ecfda',
+                    }}
+                  >
+                    <Icon style={{ width: 15, height: 15 }} />
+                    {label}
+                  </Link>
+                );
+              })}
+              <button
+                onClick={handleLogout}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '10px 14px', borderRadius: 10, cursor: 'pointer',
+                  background: 'rgba(248,113,113,0.08)', border: 'none',
+                  color: '#f87171', fontSize: 13, fontWeight: 600,
+                  marginTop: 4,
+                }}
               >
-                <Icon className="w-4 h-4" /> {label}
-              </Link>
-            ))}
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-400 w-full"
-            >
-              <FiLogOut className="w-4 h-4" /> Logout
-            </button>
+                <FiLogOut style={{ width: 15, height: 15 }} /> Logout
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Responsive helpers */}
+      <style>{`
+        @media (max-width: 768px) {
+          .hidden-mobile { display: none !important; }
+          .show-mobile   { display: flex !important; }
+        }
+      `}</style>
     </nav>
   );
 }
