@@ -99,9 +99,9 @@ export default function Dashboard() {
 
   const chartData = transactions
     ? [...transactions].reverse().map((t) => ({
-        name: new Date(t.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        value: t.balanceAfter,
-      }))
+      name: new Date(t.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      value: t.balanceAfter,
+    }))
     : [];
 
   // Average for reference line
@@ -365,5 +365,29 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+  );
+}
+                        </span >
+                      </td >
+                      <td style={{padding:'11px 0',textAlign:'right',fontFamily:'monospace',color:'#b0cdd6'}}>${fmt(t.price)}</td>
+                      <td style={{padding:'11px 0',textAlign:'right',fontFamily:'monospace',color:'#b0cdd6'}}>{t.quantity}</td>
+                      <td style={{padding:'11px 0',textAlign:'right',color:chg>=0?'#4ade80':'#f87171',fontWeight:700,fontFamily:'monospace'}}>
+                        {chg>=0?'+':''}{fmt(chg,2)}%
+                      </td>
+                      <td style={{padding:'11px 0',textAlign:'right',fontFamily:'monospace',color:'#b0cdd6'}}>${fmt(vol)}</td>
+                      <td style={{padding:'11px 0',textAlign:'right',fontFamily:'monospace',fontWeight:700,color:'#e0f7fa'}}>${fmt(t.total)}</td>
+                      <td style={{padding:'11px 0',textAlign:'right',color:'#7ecfda',fontSize:10}}>{new Date(t.createdAt).toLocaleDateString()}</td>
+                    </tr >
+                  );
+                }) : (
+  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '32px 0', color: '#7ecfda', fontSize: 13 }}>No transactions found</td></tr>
+)}
+              </tbody >
+            </table >
+          </div >
+        </div >
+
+      </div >
+    </div >
   );
 }
